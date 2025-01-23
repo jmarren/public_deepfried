@@ -1,0 +1,46 @@
+
+
+#users-modal {
+  padding: 20px;
+  background-color: black;
+}
+
+#users-container {
+    border: 1px solid #666;
+    border-radius: 3px;
+   padding: 10px;
+}
+
+#users-modal-title {
+  padding: 4px 0;
+  font-weight: 600;
+}
+
+.user-row {
+  padding: 4px;
+  border-radius: 3px;
+  min-width: 250px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+
+
+.user-row:hover {
+  background-color: var(--dark-gray);
+}
+
+
+
+#users-modal.htmx-added  {
+	display: none;
+}
+#users-modal.htmx-settling  {
+	display: none;
+}
+#users-modal.htmx-swapping {
+	display: none;
+}

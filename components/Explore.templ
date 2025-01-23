@@ -1,0 +1,32 @@
+package components
+
+import (
+	"github.com/jmarren/deepfried/services"
+	"github.com/jmarren/deepfried/util"
+)
+
+templ Explore(user *services.User, authenticated bool, tagbar templ.Component, featuredSection templ.Component, justAddedSection templ.Component, editorsPicksSection templ.Component, poppinOff templ.Component) {
+	<head hx-head="merge">
+		<link href={ util.GetStaticSrc("css/explore.css") } rel="stylesheet" type="text/css"/>
+		<link href={ util.GetStaticSrc("css/carousel.css") } rel="stylesheet" type="text/css"/>
+		<link href={ util.GetStaticSrc("css/track_card.css") } rel="stylesheet" type="text/css"/>
+	</head>
+	<div id="explore" class="page-fade-in">
+		@tagbar
+		<section id="first-section" class="normal-section">
+			if !authenticated {
+				@Hero()
+			}
+			@featuredSection
+			@justAddedSection
+		</section>
+		<section class="carousel-section">
+			<h2>editor's picks</h2>
+			@editorsPicksSection
+		</section>
+		<section class="carousel-section">
+			<h2>poppin' off</h2>
+			@poppinOff
+		</section>
+	</div>
+}

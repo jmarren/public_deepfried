@@ -1,0 +1,136 @@
+
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/services"
+	"github.com/jmarren/deepfried/util"
+)
+
+templ TrackPage(data *services.TrackPage) {
+	<head hx-head="merge">
+		<link href={ util.GetStaticSrc("css/pins.css") } rel="stylesheet" type="text/css"/>
+		<link href={ util.GetStaticSrc("css/track_page.css") } rel="stylesheet" type="text/css"/>
+	</head>
+	<div id="track-page">
+		<div id="track-page-centered">
+			<section id="header-section" class="katana-card">
+				<div id="track-img-container">
+					<img
+						width="266"
+						height="266"
+						src={ data.ArtworkSrc }
+					/>
+				</div>
+				<div id="header-right">
+					<div id="header-top">
+						<span id="header-title">
+							{ data.Title }
+						</span>
+					</div>
+					@AudioVis(&data.VisArr, data.ID.String())
+					<button
+						class="play-button track-page playable"
+						hx-audio={ util.UuidString(data.ID) }
+						hx-audio-toggle-fx="innerHTML playtriangle pausebars"
+					>
+						if ( data.IsPlaying ) {
+							<div class="pause-bars">
+								<div class="pause-bar"></div>
+								<div class="pause-bar"></div>
+							</div>
+						} else {
+							<div class="play-triangle"></div>
+						}
+					</button>
+				</div>
+			</section>
+			<div id="subsections">
+				<section id="pins-section">
+					<div id="creator-header">
+						<img class="profile-photo-sm" src={ data.ProfilePhotoSrc }/>
+						<span
+							id="creator-username"
+							class="subsection-title"
+							hx-get={ fmt.Sprintf("/%s", data.Username) }
+							hx-target="#page-content"
+							hx-push-url="true"
+						>{ fmt.Sprintf("%s", data.Username) }</span>
+						<span id="followingers">{ fmt.Sprintf("%d followers %d following", data.Followers, data.Following) }</span>
+					</div>
+					<div id="creator-pins">
+						for _, pin := range data.Pins {
+							@Pin(pin)
+						}
+					</div>
+				</section>
+				<section class="" id="stats-section">
+					<div id="stats-header" class="">stats</div>
+					<div id="stats-container" class="katana-card">
+						<div class="stats-row">
+							<span class="stats-row-label">bpm</span> <span class="stats-row-data">{ fmt.Sprintf("%d", data.Bpm) }</span>
+						</div>
+						<div class="stats-row">
+							<span class="stats-row-label">key</span> <span class="stats-row-data">C#</span>
+						</div>
+						<div class="stats-row">
+							<span class="stats-row-label">tags</span>
+							<div class="stats-row-data">
+								for _, tag := range data.Tags {
+									<span class="tag-item">{ fmt.Sprintf("%s", tag) }</span>
+								}
+							</div>
+						</div>
+						<div class="stats-row">
+							<span class="stats-row-label">filetype</span>
+							<div class="stats-row-data">
+								.mp3
+							</div>
+						</div>
+						<!--
+						<div class="stats-row">
+							<span class="stats-row-label">usage rights</span>
+							<div class="stats-row-data">
+								don't use this music
+							</div>
+						</div>
+						-->
+					</div>
+					<div id="usage-header" class="">usage rights</div>
+					<div id="usage-container" class="katana-card">don't use this music</div>
+				</section>
+			</div>
+			<!--
+
+	<table id="search-results-table">
+		<thead>
+			<tr>
+				<th scope="col">User</th>
+				<th scope="col">Title</th>
+				<th scope="col"></th>
+				<th scope="col">Bpm</th>
+				<th scope="col">Key</th>
+				<th scope="col">Includes</th>
+				<th scope="col">Tags</th>
+				<th scope="col">Uploaded</th>
+				<th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, row := range *s.AudioFiles {
+				@AudioSearchRowBody(&row)
+			}
+		</tbody>
+	</table>
+
+
+			<section id="usage-rights-section" class="subsection katana-card">
+				<span class="subsection-title">Usage Rights</span>
+				<div class="subseciton-row">
+					{ fmt.Sprintf("%s", data.UsageRights) }
+				</div>
+			</section>
+				-->
+		</div>
+	</div>
+}

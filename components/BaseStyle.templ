@@ -1,0 +1,102 @@
+package components
+
+css HtmlStyle() {
+	height: 100vh;
+	overflow-y: scroll;
+	display: flex;
+	flex-direction: column;
+}
+
+css Button() {
+	cursor: pointer;
+}
+
+css Slabo27Reg() {
+	font-family: "Slabo 27px", serif;
+	font-weight: 400;
+	font-style: normal;
+}
+
+css Root() {
+	--dark-gray: #171717;
+	--tertiary-color: #7f9299;
+	--tertiary-dark: #0d182b;
+	--secondary-background-color: white;
+	--cta-color: #098afd;
+	--border-color-one: #e1e3e3;
+	--hover-color-one: #d9d1cc;
+	--text-color-one: black;
+	--light-gray-one: #969284;
+	--light-gray-two: #d1d1d1;
+	--input-color-one: #454545;
+	--player-height: 100px;
+	--medium-image-size: 100px;
+	--box-shadow-one: 2px 10px 25px #e6e7e8;
+	--bpm-slider-min: 0%;
+	--bpm-slider-max: 0%;
+}
+
+css BodyStyle() {
+	background: linear-gradient(0deg, #1e1e1e , #292828);  
+    position: relative;
+	overflow: auto;
+	font-family: Inter;
+}
+
+css ProfilePhoto() {
+	object-fit: cover;
+	clip-path: circle(50% at 50% 50%);
+}
+
+/*
+  .profile-photo>img{
+    width: 100%;
+    height: 100%;
+  }
+
+*/
+
+css PageContent() {
+	overflow-x: hidden;
+	margin-top: 60px;
+	margin-left: 75px;
+	padding-bottom: 10px;
+	left: 240px;
+}
+
+css IconMed() {
+	width: 15px;
+	height: 15px;
+}
+
+css IconContainer() {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+css Top() {
+	z-index: 4;
+	background-color: rgba(0.0, 0.0, 0.0, 50%);
+	transition: background-color 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+}
+
+css KatanaCard() {
+	border: 1px solid #32363d;
+	background-color: #131717; 
+    border-radius: 10px;
+	color: white;
+}
+
+var BaseStyles = []templ.CSSClass{
+	HtmlStyle(),
+	Button(),
+	KatanaCard(),
+	Top(),
+	IconMed(),
+	PageContent(),
+	ProfilePhoto(),
+	BodyStyle(),
+	Root(),
+	Slabo27Reg(),
+}

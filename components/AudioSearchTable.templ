@@ -1,0 +1,98 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/services"
+)
+
+templ AudioSearchTableBody(page int, prevPage string, nextPage string, hasMore bool, s *services.AudioSearchResults) {
+	<table id="search-results-table">
+		<thead>
+			<tr>
+				<th scope="col">User</th>
+				<th scope="col">Title</th>
+				<th scope="col"></th>
+				<th scope="col">Bpm</th>
+				<th scope="col">Key</th>
+				<th scope="col">Includes</th>
+				<th scope="col">Tags</th>
+				<th scope="col">Uploaded</th>
+				<th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, row := range *s.AudioFiles {
+				@AudioSearchRowBody(&row)
+			}
+		</tbody>
+	</table>
+	<div id="pagination">
+		<div>
+			if page > 1 {
+				<button
+					class="chevron"
+					hx-get={ prevPage }
+					hx-target="#page-content"
+					hx-push-url="true"
+				>
+					@ChevronLeftIcon()
+				</button>
+			}
+			<button id="current-page-num">
+				<span>
+					{ fmt.Sprintf("%d", page) }
+				</span>
+			</button>
+			if hasMore {
+				<button
+					class="chevron"
+					hx-get={ nextPage }
+					hx-target="#page-content"
+					hx-push-url="true"
+				>
+					@ChevronRightIcon()
+				</button>
+			}
+		</div>
+	</div>
+}
+
+var SearchResultsTableOnceHandle = templ.NewOnceHandle()
+
+templ SearchResultsTableHead() {
+	@SearchRowHead()
+	@SearchResultsTableOnceHandle.Once() {
+		<style id="search-results-table-styles">
+  #search-results-table thead {
+    color: #30363b;
+  }
+
+
+  #search-results-table {
+    border-spacing: 0px 6px;
+    border-collapse: separate;
+    font-size: 12px;
+  }
+
+
+
+  #search-results-table th {
+    padding: 3px 10px 3px 10px;
+    text-align: left;
+/*    background-color: var(--dark-gray); */
+   background-color: #363535;
+    color: white;
+  }
+
+
+  #search-results-table th:first-child {
+    border-radius: 3px 0 0 0px;
+  }
+
+
+  #search-results-table th:last-child {
+    border-radius: 0 3px 0px 0;
+  }
+</style>
+	}
+}

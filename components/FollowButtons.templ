@@ -1,0 +1,27 @@
+package components
+
+import "fmt"
+
+templ FollowButton(following bool, username string) {
+	if following {
+		<button
+			class="follow-button unfollow"
+			hx-delete={ fmt.Sprintf("/following/%s", username) }
+			hx-swap="outerHTML"
+			hx-trigger="click consume"
+			hx-target="this"
+		>
+			Unfollow
+		</button>
+	} else {
+		<button
+			class="follow-button follow"
+			hx-post={ fmt.Sprintf("/following/%s", username) }
+			hx-swap="outerHTML"
+			hx-target="this"
+			hx-trigger="click consume"
+		>
+			Follow
+		</button>
+	}
+}

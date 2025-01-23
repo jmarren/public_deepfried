@@ -1,0 +1,109 @@
+package components
+
+import (
+	"github.com/jmarren/deepfried/services"
+	"github.com/jmarren/deepfried/util"
+)
+
+templ TrackCardSearch(title string, m []*services.PlayableElt) {
+	<head hx-head="merge">
+		<link href={ util.GetStaticSrc("css/my_downloads.css") } rel="stylesheet" type="text/css"/>
+		<link href={ util.GetStaticSrc("css/carousel.css") } rel="stylesheet" type="text/css"/>
+		<link href={ util.GetStaticSrc("css/track_card.css") } rel="stylesheet" type="text/css"/>
+	</head>
+	<div id="my-downloads">
+		<div id="my-downloads-header">
+			<div id="my-downloads-title">
+				{ title }
+			</div>
+			<div class="searchbar-container">
+				<form id="searchbar" class="icon-container" hx-get="/my-downloads" hx-select="#downloads-card-grid" hx-target="#downloads-card-grid" hx-push-url="true">
+					<button type="submit">
+						@SearchIcon()
+					</button>
+					<input
+						class="searchbar-input"
+						type="text"
+						name="downloads_keyword"
+						hx-get="/my-downloads"
+						hx-trigger="input throttle:1s"
+						hx-select="#downloads-card-grid"
+						hx-target="#downloads-card-grid"
+						hx-swap="innerHTML"
+						placeholder="search downloads"
+						hx-push-url="false"
+						hx-on:focus="event.preventDefault()"
+						hx-on:change="event.preventDefault()"
+						hx-on:input="event.preventDefault()"
+						hx-on:keydown="console.log(event.key); event.key.toLowerCase() === 'arrowdown' ? console.log('arrow down') : null "
+					/>
+					<!--				<input hidden type="number" name="bpm"/>
+				<input hidden type="text" name="key"/>
+				<input hidden type="radio" value="natural"/>
+				<input hidden type="radio" value="major"/>
+				-->
+					<div id="search-dropdown"></div>
+				</form>
+			</div>
+		</div>
+		<div id="downloads-card-grid">
+			for _, card := range m {
+				<!--
+				<div class="downloads-card-container">
+				-->
+				@CarouselCardBody(card)
+				<!--
+				</div>
+				-->
+			}
+		</div>
+	</div>
+}
+
+/*
+	<!--
+	<div class="downloads-grid-item katana-card track-card-container">
+		<div class="card-initial">
+			<button
+				class="playable"
+				id={ card.EltId }
+				data-playbutton-type="carousel-card"
+				hx-audio={ util.UuidString(card.ID) }
+				hx-audio-toggle-fx="class white-track-card"
+				hx-audio-toggle-target="closest .track-card-container"
+				hx-get="/player"
+				hx-target="#player"
+				hx-swap="outerHTML"
+			>
+				<img class="artwork" src={ card.ArtworkSrc }/>
+			</button>
+			<div class="track-info">
+				<span class="track-info-right">
+					<span
+						class="card-title clickable-text"
+						hx-trigger="click"
+						hx-get={ fmt.Sprintf("%s/%s", card.Username, card.Title) }
+						hx-target="#page-content"
+						hx-push-url="true"
+					>{ card.Title }</span>
+					<span class="card-bpm">
+						{ fmt.Sprintf("%d", card.Bpm) } bpm
+					</span>
+					<span class="spacer"></span>
+				</span>
+			</div>
+			<!--
+			if card.IsPlaying {
+				<div id="playing-indicator">
+					<div id="playing-indicator-content">
+						<div class="triangle-forward-container">
+							<div class="triangle control triangle-forward"></div>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+		<div id="extra-info"></div>
+	</div>
+			-->
+*/

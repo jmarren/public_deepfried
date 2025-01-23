@@ -1,0 +1,99 @@
+package components
+
+templ AccountDropdown() {
+	<div
+		class="katana-card"
+		id="account-dropdown"
+		tabindex="0"
+		hx-on:focusout="this.style.display = 'none'"
+		hx-on:htmx:after-settle="this.focus()"
+		hx-swap-oob="true"
+		style="visibility: visible;"
+	>
+		<button
+			hx-get="/me"
+			hx-target="#page-content"
+			hx-trigger="pointerdown"
+			hx-swap="innerHTML"
+			hx-push-url="true"
+		>
+			My Profile
+		</button>
+		<button
+			hx-get="/my-downloads"
+			hx-target="#page-content"
+			hx-trigger="pointerdown"
+			hx-swap="innerHTML"
+			hx-push-url="true"
+		>
+			My Downloads
+		</button>
+		<button
+			hx-get="/my-uploads"
+			hx-target="#page-content"
+			hx-trigger="pointerdown"
+			hx-swap="innerHTML"
+			hx-push-url="true"
+		>My Uploads</button>
+	</div>
+}
+
+var dropdownHeadHandle = templ.NewOnceHandle()
+
+templ AccountDropdownHead() {
+	@dropdownHeadHandle.Once() {
+		<script hx-preserve="true" id="account-dropdown-script">
+  const RemoveAccountDropdown = (e) => {
+    if (e.relatedTarget == null) {
+      document.getElementById("account-dropdown").innerHTML = ""
+      document.getElementById("account-dropdown").style.visibility = "hidden";
+    } else if (e.relatedTarget.id != "profile-photo-button") {
+      document.getElementById("account-dropdown").innerHTML = ""
+      document.getElementById("account-dropdown").style.visibility = "hidden";
+    }
+    return
+  }
+
+  const FocusAccountDropdown = () => {
+    let dropdown = document.getElementById("account-dropdown")
+    dropdown.focus()
+  }
+
+
+
+</script>
+		<style id="account-dropdown-styles" hx-preserve="true">
+  #account-dropdown {
+    width: fit-content;
+    white-space: nowrap;
+    font-family: Inter;
+    font-size: 12px;
+    font-weight: semibold;
+    position: absolute;
+    padding: 10px;
+    background-color: white;
+    transform: translateY(15px) translateX(-100px);
+    z-index: 2;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    border: 0.5px solid var(--light-gray-2);
+    color: var(--dark-gray);
+    font-weight: 600;
+  }
+
+  #account-dropdown button {
+    text-align: start;
+    width: calc(100% - 20px);
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  #account-dropdown button:hover {
+    cursor: pointer;
+    background-color: #ededed;
+  }
+
+</style>
+	}
+}

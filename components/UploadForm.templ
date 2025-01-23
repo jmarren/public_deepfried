@@ -1,0 +1,493 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/util"
+)
+
+templ UploadForm(name string, uploadId string) {
+	<head hx-head="append">
+		<!--
+		<script hx-preserve="true" src={ util.GetStaticSrc("js/hx_upload.js") }></script>
+		<script hx-preserve="true" src={ util.GetStaticSrc("js/upload_form.js") }></script>
+		-->
+		<link href={ util.GetStaticSrc("css/upload_form.css") } rel="stylesheet" type="text/css"/>
+	</head>
+	<div id="selected-files" hx-on:click="event.stopPropagation()" hx-file-upload-form={ fmt.Sprintf("%s", name) }>
+		<!--		<input hidden type="file" name="stems" hx-on:input="addStemFile(this)" /> -->
+		<div class="selected-file" id={ fmt.Sprintf("file_%s", name) }>
+			<div class="selected-file-left">
+				<div class="artwork-input-container">
+					<div class="input-container">
+						<label for="artwork">select an image</label>
+						<!--
+						<input
+							hx-file-upload-type="artwork"
+							hx-file-upload-id={ name }
+							type="file"
+							name="artwork"
+							accept="image/*"
+							hx-on:change="HandleArtworkSelected(this)"
+						/>
+						-->
+					</div> <img class="file-image" id="artwork-display" hx-on:click="htmx.find('input[name=artwork]').click()"/>
+				</div>
+				<div class="file-title">
+					if len(name) < 19 {
+						{ name }
+					} else {
+						{ fmt.Sprintf("%s...", name[0:16]) }
+					}
+					<span hx-upload-status></span>
+				</div>
+				<div class="progress-bar" hx-upload-progress>
+					<div id="progress-marker"></div>
+				</div>
+			</div>
+			<div class="selected-file-right">
+				<div class="upload-input-form">
+					<!-- HIDDEN INPUTS -->
+					<input hidden type="text" name="audio_file_name" value={ name }/>
+					<input hidden type="text" name="artwork_file_name"/>
+					<input hidden type="text" name="stem_file_names" value="[]"/>
+					<input hidden type="text" name="upload-id" value={ uploadId }/>
+					<div class="upload-input-section">
+						<div class="input-container">
+							<label for="title">title</label>
+							<input
+								class="input-field"
+								type="text"
+								name="title"
+							/>
+						</div>
+						<div class="input-container">
+							<label for="bpm">bpm</label>
+							<input
+								class="input-field"
+								type="number"
+								name="bpm"
+							/>
+						</div>
+						<div class="input-container">
+							<label for="musical-key">key</label>
+							<select
+								class="input-field"
+								name="musical-key"
+							>
+								<option value="C">C</option>
+								<option value="D">D</option>
+								<option value="E">E</option>
+								<option value="F">F</option>
+								<option value="G">G</option>
+								<option value="A">A</option>
+								<option value="B">B</option>
+							</select>
+						</div>
+						<div class="input-container">
+							<label for="key-signature">key signature</label>
+							<select
+								class="input-field"
+								name="musical-key-signature"
+							>
+								<option value="sharp">#</option>
+								<option value="flat">&#9837;</option>
+								<option value="natural">natural</option>
+							</select>
+						</div>
+						<div class="input-container">
+							<label for="major-minor">Major/Minor</label>
+							<select
+								class="input-field"
+								name="major-minor"
+							>
+								<option value="Major">Major</option>
+								<option value="Minor">Minor</option>
+							</select>
+						</div>
+					</div>
+					<div class="upload-input-section">
+						<div class="input-container">
+							<label for="usage">usage rights</label>
+							<textarea
+								class="input-field"
+								name="usage"
+								maxlength="255"
+							></textarea>
+						</div>
+						<div class="input-container tags-inputs">
+							<div class="tags-label">
+								tags
+							</div>
+							<div class="tag-input-container">
+								<input class="tag-input input-field" type="text" name="tag-1" placeholder="jazz"/>
+							</div>
+							<button id="add-tag-button" class="input-form-button" hx-on:click="AddTagButton(this)">add tag</button>
+						</div>
+					</div>
+					<div class="upload-input-section" id="stems-input-section">
+						<div class="input-container">
+							<div>stems</div>
+							<button id="add-stems-button" class="input-form-button" hx-on:click="htmx.find('input[name=stems-1]').click()">add stem file</button>
+						</div>
+					</div>
+				</div>
+				<div id="upload-error"></div>
+				<button class="upload-file-button" hx-post="/audio" hx-target="#upload-error" hx-swap="innerHTML" hx-include="closest .selected-file-right">post</button>
+			</div>
+		</div>
+	</div>
+}
+
+var uploadFormFile2OnceHandle = templ.NewOnceHandle()
+
+/*
+
+templ UploadFormFile2Head() {
+	@uploadFormFileOnceHandle.Once() {
+		<head>
+			<script id="upload-form-file-script">
+
+		function AddTagButton(elt) {
+			const container = htmx.closest(elt, ".input-container")
+			const numTagInputs = htmx.findAll(container, "input").length
+			if (numTagInputs >= 3) return
+			const newTagContainer = document.createElement("div")
+			newTagContainer.className="tag-input-container"
+			const newInput = document.createElement("input")
+			newInput.name=`tag-${numTagInputs + 1}`
+			newInput.className="tag-input input-field"
+			newInput.placeholder = "jazz"
+			newInput.type = "text"
+			newTagContainer.appendChild(newInput)
+			const newRemoveButton = document.createElement("button")
+			newRemoveButton.onclick = (e) => e.target.closest(".tag-input-container").remove()
+			newRemoveButton.className="remove-tag-button"
+			const removeIcon = document.createElement("div")
+			removeIcon.className="remove-icon"
+			newRemoveButton.appendChild(removeIcon)
+			newTagContainer.appendChild(newRemoveButton)
+			container.insertBefore(newTagContainer, elt)
+			htmx.process(container)
+		}
+
+	async function InitUpload(file, type) {
+	        const url = `/init-upload/${type}`
+		const body = {
+			'filename': file.name,
+			'totalsize': file.size,
+			}
+	
+		if (type == "stems") {
+			body.mainfile = htmx.find("input[name=audio_file_name]").value 
+		}
+		try {
+		      const response = await fetch(url, {
+			method: 'POST',
+			body: JSON.stringify(body),
+		      })
+		      if (!response.ok) {
+			throw new Error("failed init upload");
+		      }
+		      const res = await response.text()
+		      message = res
+		      return true
+
+		    } catch (e) {
+		      console.error(e)
+		      return false
+		    } finally {
+			const worker = new Worker("/workers/upload-worker.js")
+			window.workers.push(worker)
+			let workerIndex = window.workers.length - 1
+			const fileObj = {
+				file: file,
+				type: type,
+			} 
+			window.workers[workerIndex].postMessage(fileObj)
+		    }
+		}
+
+		function HandleArtworkSelected(elt) {
+			const file = elt.files[0]
+			const fileReader = new FileReader()
+			fileReader.readAsDataURL(file)
+			const artworkInputContainer = htmx.closest(elt, ".artwork-input-container")
+			const imageElt = htmx.find(artworkInputContainer, ".file-image")
+			htmx.on(fileReader, "load", () => {
+				imageElt.src = fileReader.result
+			})
+			const selectedFile = htmx.closest(elt, ".selected-file")
+			const artworkNameInput = htmx.find(selectedFile, "input[name=artwork_file_name]")
+			artworkNameInput.value = file.name
+			InitUpload(file, "artwork")
+		}
+
+	    
+		function UploadAudioFile(fileObj) {
+		  const worker = new Worker("/workers/upload-worker.js")
+		  worker.postMessage(fileObj)
+		  worker.addEventListener("message", (e) => {
+			const filename = e.data[0]
+			const progress = e.data[1]
+			const msg = e.data[2]
+			const fileElt = document.getElementById(`file_${e.data[0]}`)
+			const progressElt = htmx.find(fileElt, ".progress-marker")
+			progressElt.style.width = `${e.data[1] * 100}%`
+
+			if (msg == "complete") {
+				const parent = progressElt.parentElement
+				parent.style.backgroundColor = 'white'
+				parent.innerHTML = 'uploaded'
+				parent.style.border = ''
+				parent.style.fontFamily = 'Inter'
+				parent.style.color = '#706f6f'
+				parent.className = 'success-message'
+			} else if (msg.includes("error")) {
+				htmx.find("#upload-error").innerHTML = msg		
+				const parent = progressElt.parentElement
+				parent.style.backgroundColor = 'white'
+				parent.innerHTML = 'error'
+				parent.style.border = ''
+				parent.style.fontFamily = 'Inter'
+				parent.style.color = '#706f6f'
+				parent.className = 'success-message'
+
+			}
+		  })
+		}
+		
+		window.addEventListener("upload-audio-files", function() {
+		  const audioFiles = htmx.find("#file-input").files
+
+	          for (let i = 0; i < audioFiles.length; i++) {
+			const filename = audioFiles[i].name
+			const audioFile = {file: audioFiles[i], type: "audio"}
+			UploadAudioFile(audioFile)
+		   }
+		})
+
+		function addStemFile(elt) {
+			console.log("files: ", elt.files)
+			const files = elt.files
+			const stemsSection = htmx.find("#stems-input-section")
+			const container = htmx.find(stemsSection, ".input-container")
+			const addButton = htmx.find(stemsSection, "#add-stems-button")
+
+			const stemFileNamesInput = htmx.find("input[name=stem_file_names]") 
+			const stemFileNames = JSON.parse(stemFileNamesInput.value)
+			console.log(stemFileNames)
+
+			for (let i = 0; i < files.length; i++) {
+				const fileElt = document.createElement('div');
+				fileElt.innerHTML = files[i].name
+				stemFileNames.push(files[i].name)
+				fileElt.className = "stem-file"
+				container.insertBefore(fileElt, addButton)
+				InitUpload(files[i], "stems")
+			}
+			const newValue = JSON.stringify(stemFileNames)
+			console.log(newValue)
+			stemFileNamesInput.value = newValue
+		}
+  
+		</script>
+			<style id="upload-styles">
+#selected-files {
+	 background-color: white;
+	 padding: 35px;
+	 border-radius: 11px;
+	 display: flex;
+}
+
+.selected-file {
+  display: flex;
+  flex-direction: row;
+  min-height: 250px;
+}
+
+label[for=artwork] {
+  cursor: pointer;
+  text-align: center;
+}
+
+#upload-error {
+	text-align: center;
+	padding: 10px;
+}
+
+.file-title {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+input[type=file] {
+ opacity: 0%;
+ width: 0;
+ height: 0;
+ }
+
+ .file-image {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	cursor: pointer;
+ }
+
+ .input-field {
+    padding: 4px;
+    border-radius: 7px;
+    border: 1px solid #8B8E98;
+    filter: drop-shadow(0px 1px 0px #efefef) drop-shadow(0px 1px 0.5px rgba(239, 239, 239, 0.5));
+ }
+
+.selected-file-left {
+  width: 200px;
+  position: relative;
+} 
+
+.selected-file-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+  padding-left: 20px; 
+}
+
+
+.upload-input-form {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  padding-bottom: 20px;
+}
+
+.upload-input-section {
+  flex-grow: 1;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 10px;
+  position: relative;
+}
+
+.artwork-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  background-color: lightgray;
+  position: relative;
+}
+
+.artwork-input-container:hover {
+  background-color: gainsboro;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 15px;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+}
+
+.progress-marker {
+  height: 100%;
+  background-color: var(--dark-gray);
+  width: 0;
+  border-radius: 4px;
+  }
+
+.upload-file-button {
+  background-color: var(--dark-gray);
+  text-align: center;
+  color: white;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: 600;
+  height: 40px;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+} 
+
+
+.upload-file-button:hover {
+    background-color: white;
+    color: var(--dark-gray);
+    outline: 1px inset var(--dark-gray);
+}
+
+
+.input-form-button {
+   border:1px solid var(--dark-gray);
+   border-radius: 4px;
+   height: 20px;
+   font-size: 0.75em;
+   text-align: center;
+   margin-top: 10px;
+   padding: 4px;
+  transition: background-color 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+}
+
+
+.input-form-button:hover { 
+  color: white;
+  background-color: #2e2d2d;
+}
+
+.remove-tag-button {
+	padding: 4px;
+	border-radius: 100%;
+	border: 1px solid var(--dark-gray);
+	height: 10px;
+	width: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+
+.remove-tag-button:hover {
+	background-color: #d4cfcf;
+}
+
+.tag-input-container {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+	margin-bottom: 4px;
+}
+
+
+.remove-icon {
+	height: 3px;
+	width: 6px;
+	background-color: #8B8E98;
+	pointer-events: auto;
+}
+
+#stems-input-section {
+	min-width: 150px;
+}
+
+.stem-file {
+   border:1px solid var(--dark-gray);
+   border-radius: 4px;
+   height: 20px;
+   font-size: 0.75em;
+   margin-top: 10px;
+   padding: 4px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   background-color: #e3e3e3;
+}
+
+			</style>
+		</head>
+	}
+}
+
+*/

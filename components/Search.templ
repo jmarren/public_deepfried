@@ -1,0 +1,48 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/util"
+)
+
+templ SearchPageBody(keyword string, tagBar templ.Component, userSearchSection templ.Component, audioSearchTable templ.Component) {
+	<head>
+		<link href={ util.GetStaticSrc("css/search.css") } rel="stylesheet" type="text/css"/>
+		<!-- <script hx-preserve="true" src={ util.GetStaticSrc("js/audio_vis.js") }></script> -->
+	</head>
+	<div id="search-results-page" class="page-fade-in">
+		<div id="tag-bar-container">
+			@tagBar
+		</div>
+		<div id="above-results-table">
+			<div id="showing-results-for">Showing Results for  { fmt.Sprintf("\"%s\"", keyword) } </div>
+		</div>
+		<section class="search-results-section">
+			@userSearchSection
+		</section>
+		<section class="search-results-section" id="search-uploads-section">
+			<div id="above-search-results-table">
+				<div class="search-section-title">uploads</div>
+				<button
+					id="filter-button"
+					class="katana-card"
+					hx-get="/modal/filters"
+					hx-swap="innerHTML"
+					hx-target="#modal"
+					preload="mouseover"
+				>
+					filters
+				</button>
+			</div>
+			<div id="table-and-pagination">
+				<div>
+					@audioSearchTable
+					<div id="plant-icon-key">
+						@PlantIcon()
+						includes stems
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+}

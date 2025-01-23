@@ -1,0 +1,458 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/services"
+	"github.com/jmarren/deepfried/util"
+)
+
+templ AudioSearchRowBody(row *services.AudioSearchRow) {
+	<tr class="search-results-row">
+		<td>
+			<div class="artist-cell">
+				<div class="profile-photo-container">
+					<img
+						width="30"
+						height="30"
+						class="profile-photo"
+						src={ row.ProfilePhotoSrc }
+					/>
+				</div>
+				<div
+					class="clickable-text"
+					hx-trigger="click"
+					hx-get={ fmt.Sprintf("/%s", row.Username) }
+					hx-target="#page-content"
+					hx-replace-url="true"
+				>
+					{ row.Username }
+				</div>
+			</div>
+		</td>
+		<td>
+			<div class="track-cell">
+				<img
+					width="30"
+					height="30"
+					class="search-row-photo"
+					src={ row.ArtworkSrc }
+				/>
+				<div
+					class="cell-text clickable-text"
+					hx-trigger="click"
+					hx-get={ fmt.Sprintf("/%s/%s", row.Username, row.Title) }
+					hx-target="#page-content"
+					hx-replace-url="true"
+				>
+					{ row.Title }
+				</div>
+			</div>
+		</td>
+		<td class="play-vis-td">
+			<div class="play-button-and-vis">
+				<button
+					class="play-button search-page playable"
+					id={ row.EltId }
+					hx-audio={ row.ID.String() }
+					hx-audio-toggle-fx="innerHTML playtriangle pausebars"
+					preload="mouseover"
+					preload-images="true"
+					data-audio-src={ row.AudioSrc }
+					data-audio-user={ row.Username }
+					data-audio-title={ row.Title }
+					data-playbutton-type="triangle-bars"
+					data-img-src={ row.ArtworkSrc }
+				>
+					if row.IsPlaying {
+						<div class="pause-bars">
+							<div class="pause-bar"></div>
+							<div class="pause-bar"></div>
+						</div>
+					} else {
+						<div class="play-triangle"></div>
+					}
+				</button>
+				<div class="audio-vis-td">
+					@AudioVis(&row.VisArr, row.ID.String())
+				</div>
+			</div>
+		</td>
+		<td>{ fmt.Sprintf("%d", row.Bpm) }</td>
+		<td>
+			{ fmt.Sprintf("%s", row.DisplayKey) }
+		</td>
+		<td>
+			<div class="flex-cell">
+				if len(row.StemFileNames) > 0 {
+					@PlantIcon()
+				}
+				<span class="mp3-text">
+					{ fmt.Sprintf(".mp3") }
+				</span>
+				<span class="wav-text">
+					{ fmt.Sprintf(".wav") }
+				</span>
+			</div>
+		</td>
+		<td class="cell-text">
+			<div class="tags">
+				for _, tag := range row.TagArray {
+					<span class="tag">
+						{ tag }
+					</span>
+				}
+			</div>
+		</td>
+		<td>
+			{ row.Title }
+		</td>
+		<td>
+			<div class="flex-cell">
+				if len(row.StemFileNames) > 0 {
+					<button
+						class="download-button"
+						hx-on:click="toggleDownloadPopover(this) "
+					>
+						@DownloadIcon()
+					</button>
+					<div class="download-popover">
+						<button
+							hx-on:pointerdown="downloadItem(this, 'regular')"
+							data-audio-title={ row.Title }
+							data-audio-src={ row.AudioSrc }
+							data-audio-user={ row.Username }
+						>
+							Download
+						</button>
+						<button
+							hx-on:pointerdown="downloadItem(this, 'both')"
+							data-audio-title={ row.Title }
+							data-audio-src={ row.AudioSrc }
+							data-stems-srcs={ templ.JSONString(row.StemFileNames) }
+							data-audio-user={ row.Username }
+						>
+							Download with stems
+						</button>
+						<button
+							hx-on:pointerdown="downloadItem(this, 'stems-only')"
+							data-audio-title={ row.Title }
+							data-stems-srcs={ templ.JSONString(row.StemFileNames) }
+						>
+							Download stems only
+						</button>
+					</div>
+				} else {
+					<button
+						class="download-button"
+						hx-on:click="downloadItem(this, 'regular')"
+						data-audio-id={ util.UuidString(row.ID) }
+						data-audio-title={ row.Title }
+						data-audio-src={ row.AudioSrc }
+						data-audio-user={ row.Username }
+						data-stems-srcs={ templ.JSONString(row.StemFileNames) }
+					>
+						@DownloadIcon()
+					</button>
+				}
+				<!--				<button
+					hx-on:click="downloadItem(this)"
+					data-audio-title={ data.TrackTitle }
+					data-audio-src={ data.AudioSrc }
+				>
+					@DownloadIcon()
+				</button>
+				-->
+			</div>
+		</td>
+	</tr>
+}
+
+var searchRowHandle = templ.NewOnceHandle()
+
+css FirstTd() {
+	border-top-left-radius: 10px;
+	border-bottom-left-radius: 10px;
+	border-left: 1px solid #32363d;
+	border-top: 1px solid #32363d;
+	border-bottom: 1px solid #32363d;
+}
+
+css LastTd() {
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-right: 1px solid #32363d;
+	border-top: 1px solid #32363d;
+	border-bottom: 1px solid #32363d;
+}
+
+css AudioVisTd() {
+	border-radius: 4px;
+	padding: 3px;
+	margin: 3px;
+	min-width: 300px;
+	position: relative;
+}
+
+css FlexCell() {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 3px;
+}
+
+css Td() {
+	background-color: var(--dark-gray);
+	color: white;
+	font-family: Inter;
+}
+
+templ SearchRowHead() {
+	@AudioVisHead()
+	@DownloadIconHead()
+	@searchRowHandle.Once() {
+		<script id="search-results-row-script">
+
+	function toggleDownloadPopover(elt) {
+		const popover = htmx.find(elt.parentElement, '.download-popover')
+		if (popover.style.display == 'none' || !popover.style.display) {
+			popover.style.display = 'flex'
+			popover.tabIndex = '0'
+			popover.focus()
+			popover.onblur = (e) => {
+				toggleDownloadPopover(e.target);
+			}
+		 } else {
+			 popover.style.display = 'none'
+			 popover.onblur = null;
+		 }
+	}
+
+	</script>
+		<style id="search-results-row-styles">
+  .search-results-row td:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+      border-left: 1px solid #32363d;
+      border-top: 1px solid #32363d;
+      border-bottom: 1px solid #32363d;
+  }
+
+  .search-results-row td:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+      border-right: 1px solid #32363d;
+      border-top: 1px solid #32363d;
+      border-bottom: 1px solid #32363d;
+  }
+
+  .search-results-row td:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+  }
+
+  .search-results-row td:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    position: relative;
+  }
+
+
+  .search-results-row .audio-vis-td {
+    border-radius: 4px;
+    padding: 3px;
+    margin: 3px;
+    min-width: 300px;
+    position: relative;
+  }
+
+  .search-results-row td {
+   background-color: var(--dark-gray);
+   color: white;
+    font-family: Inter;
+  }
+
+  .search-results-row:hover td {
+    background-color: #1f2124;
+    transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  }
+
+  .search-results-row td {
+    padding: 3px 10px 3px 10px;
+      border-top: 1px solid #32363d;
+      border-bottom: 1px solid #32363d;
+  }
+
+  .search-results-row .track-image-container {
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
+    min-height: 35px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+
+  .search-results-row .track-image-container .track-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+  }
+
+  .search-results-row .profile-photo-container {
+    height: 25px;
+    width: 25px;
+  }
+
+
+  .search-results-row .artist-cell,
+  .search-results-row .track-cell {
+    display: flex;
+    align-items: center;
+    gap: 7.5px;
+  }
+
+
+
+
+  .search-results-row .play-button {
+    height: 30px;
+    width: 30px;
+    min-height: 30px;
+    min-width: 30px;
+    background-color: var(--dark-gray);
+    border-radius: 4px;
+  }
+
+  .search-results-row .play-button:hover {
+    background-color: #393c40;
+  }
+
+
+.search-results-row .pause-bars {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 10%;
+	position: relative;
+  }
+
+.search-results-row .pause-bars .pause-bar {
+	width: 10%;
+	height: 40%;
+	background-color: white;
+  }
+
+  .search-results-row .cell-text {
+    white-space: nowrap;
+  }
+
+
+  .search-results-row .play-triangle {
+    height: 100%;
+    width: 100%;
+    clip-path: polygon(25% 20%, 31% 18%, 80% 39%, 83% 44%, 83% 51%, 81% 55%, 31% 82%, 25% 80%, 21% 75%, 21% 25%, 25% 20%);
+    background-color: white;
+  }
+
+ .play-vis-td {
+	max-width: 400px;
+}
+
+  .search-results-row .play-button-and-vis {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    justify-content: center;
+  }
+
+
+  .search-results-row .tag {
+    background-color: #f0f0f0;
+    border: 0.5px solid #8a8a8a;
+    padding: 1px 3px 1px 3px;
+    border-radius: 6px;
+    color: #545454;
+  }
+
+
+
+  .search-results-row .tags {
+    display: flex;
+    gap: 3px;
+    font-weight: 600;
+  }
+
+
+
+  .mp3-text,
+  .wav-text {
+    font-weight: 600;
+    color: #595959;
+  }
+
+  .flex-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+
+  .search-results-row  .download-popover {
+	position:absolute;
+	transform: translateX(-60%) translateY(40%);
+	padding: 10px;
+	background-color: white;
+	border-radius: 10px;
+	border: 1px solid #32363d;
+	z-index: 4;
+	color: var(--dark-gray);
+	font-weight: 600;
+	flex-direction: column;
+	gap: 4px;
+	display: none;
+  }
+
+  .search-results-row  .download-popover button {
+	white-space: nowrap;
+	padding: 10px;
+	align-self: stretch;
+	border-radius: 10px;
+  }
+
+  .search-results-row  .download-popover button:hover {
+	background-color: #ededed;
+  }
+
+  search-results-row .download-popover:focus-within {
+	outline: 1px solid blue;
+  }
+
+
+
+  .download-button {
+    color: dodgerblue;
+  }
+
+  .download-button svg {
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+  }
+
+  .download-button {
+    clip-path: circle(12.5px);
+  }
+
+  .download-button:hover {
+    cursor: pointer;
+    background-color: white;
+  }
+</style>
+		<script id="search-results-row-script">
+</script>
+	}
+}

@@ -1,0 +1,177 @@
+#my-profile {
+    padding-bottom: 10px;
+    max-width: calc(100vw - 50px);
+    flex-grow: 1;
+}
+
+#profile-header-photo {
+    height: 120px;
+    width: 120px;
+    border-radius: 3px;
+}
+
+ #my-profile section {
+  margin: 10px 0px 10px 20px;
+}
+  #my-profile .carousel-section {
+    transform: translateX(-20px);   
+   width: 100%;
+}
+
+#my-profile .carousel-section .section-title {
+  padding-left: 20px;
+}
+
+
+  #my-profile #profile-header {
+    padding: 10px 10px 20px 0px;
+    color: white;
+    display: flex;
+    min-width: 500px;
+    border-bottom:  1px solid #2f3133;
+  }
+
+ #my-profile  #profile-header  img {
+  height: 300px;
+  width: 300px;
+  object-fit: cover;
+}
+
+  #my-profile #profile-header-info {
+    padding-left: 20px;
+    flex-grow: 1;
+  }
+
+  #profile-header-info-top {
+    display: flex;
+    gap: 5px;
+  }
+
+  #my-profile #profile-user-bio {
+  }
+
+#edit-buttons-container { 
+  padding: 4px;
+  display:flex;
+  gap: 4px;
+  justify-content: start;
+  align-items: center;
+}
+
+  #edit-icon {
+    display: inline-block;
+  }
+
+  #edit-icon:hover {
+    color: darkgray;
+  }
+
+  #edit-pins-button {
+    display: inline-block;
+    font-size: 0.7em;
+    max-width: 11em;
+    max-height: 24px;
+    padding: 3px 4px;
+    background-color: white;
+    color: var(--dark-gray);
+    border-radius: 5px;
+  }
+
+
+
+  #profile-header-info-sub {
+    padding-left: 4px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  #followingers {
+    display: flex;
+    padding-bottom: 4px;
+  }
+  #followingers h2 {
+    cursor: pointer;
+  }
+
+  svg {
+    cursor: pointer;
+  }
+
+  #my-profile #links {
+    align-items: end;
+    padding: 5px;
+    display: flex;
+    gap: 5px;
+  }
+
+  #my-profile #profile-header-info-top h1 {
+    font-weight: bold;
+    font-size: 40px;
+  }
+
+ .follow-button {
+    padding: 5px 0px 5px 0px;
+    color: white;
+    width: 85px;
+    text-align: center;
+    border-radius: 5px;
+    font-weight: 700;
+    font-family: Inter;
+    font-size: 12px;
+    margin: 5px;
+    border: 1px solid var(--dark-gray);
+  }
+
+  .follow-button.follow {
+    background-color: var(--cta-color);
+}
+
+  .follow-button.unfollow {
+    background-color: var(--dark-gray);
+  }
+
+  .follow-button.follow:hover {
+    background-color: #2895f7;
+  } 
+
+   .follow-button.unfollow:hover {
+/*background-color:#9ad3e6;*/
+    background-color: #212121;
+  } 
+
+
+  #profile-user-bio {
+	margin-bottom: 15px;
+  }
+
+
+  #my-profile .section-title {
+    color: white;
+    font-weight: 600;
+    font-family: Inter;
+}
+
+
+
+  
+/* Pins Section */
+  
+   #pin-container {
+      display: flex;
+     gap: 10px;
+    }
+
+
+  #pins-section {
+    gap: 10px;
+  }
+
+  #pins-section h2 {
+    /* unset: all; */
+    font-family: Inter;
+    font-weight: 500;
+    font-size: 16px;
+    color: #152d36;
+  }
+
+

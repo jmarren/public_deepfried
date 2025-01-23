@@ -1,0 +1,364 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/services"
+)
+
+templ TopBar(profilePhotoSrc string, notifications []*services.FollowNotification) {
+	<nav id="topbar">
+		<div id="searchbar-container">
+			<form id="searchbar" class="icon-container" hx-get="/search?page=1" hx-target="#page-content" hx-push-url="true">
+				<button type="submit">
+					@SearchIcon()
+				</button>
+				<input
+					class="searchbar-input"
+					type="text"
+					name="keyword"
+					hx-get="/search-bar-dropdown"
+					hx-trigger="input throttle:1s"
+					hx-target="#search-dropdown"
+					hx-swap="innerHTML"
+					placeholder="search for music"
+					hx-push-url="false"
+					hx-on:focus="event.preventDefault()"
+					hx-on:blur="htmx.find(this.parentElement, '#search-dropdown').innerHTML = ''"
+					hx-on:change="event.preventDefault()"
+					hx-on:input="event.preventDefault()"
+					hx-on:keydown="console.log(event.key); event.key.toLowerCase() === 'arrowdown' ? console.log('arrow down') : null "
+				/>
+				<!--				<input hidden type="number" name="bpm"/>
+				<input hidden type="text" name="key"/>
+				<input hidden type="radio" value="natural"/>
+				<input hidden type="radio" value="major"/>
+				-->
+				<div id="search-dropdown"></div>
+			</form>
+		</div>
+		<!-- <button onclick="toggleDarkMode()">dark mode</button> -->
+		<div id="top-bar-right">
+			<!-- <a href="/search-results">Create Account</a> -->
+			if profilePhotoSrc == "" {
+				<button hx-get="/account-dropdown" id="create-profile-button">
+					Create Profile
+				</button>
+			} else {
+				<div id="notification-container">
+					<button
+						id="notification-button"
+						hx-patch="/notifications"
+						hx-target="#notification-red-circle"
+						hx-swap="outerHTML"
+						_="
+							  on click 
+							  toggle the *display of #notification-dropdown
+							  on focusout 
+							   hide #notification-dropdown with *display
+						"
+					>
+						@NotificationBell()
+						if  len(notifications) > 0 {
+							<div id="notification-red-circle"></div>
+						}
+					</button>
+					<div
+						class="katana-card topbar-dropdown"
+						id="notification-dropdown"
+						tabindex="0"
+						style="display: none"
+						_="
+							  on blur
+							    log 'blur'
+							    hide me with *display
+							  on focusout 
+							    log 'focusout'
+							    hide me with *display
+							"
+					>
+						if len(notifications) < 1 {
+							<div>No notifications</div>
+						} else {
+							for _, notif := range notifications {
+								<button
+									hx-get={ fmt.Sprintf("/%s", notif.Username) }
+									hx-target="#page-content"
+								>
+									<img src={ notif.ProfilePhotoSrc }/>
+									{ notif.Username } followed you!
+								</button>
+							}
+						}
+					</div>
+				</div>
+				<button id="upload-button" hx-get="/modal/upload" hx-swap="innerHTML" hx-target="#modal" preload="mouseover">
+					upload
+				</button>
+				<div id="far-right-object">
+					<button
+						id="profile-photo-button"
+						_="
+						  on click 
+						  toggle the *display of #account-dropdown
+						  on focusout 
+						   hide #account-dropdown with *display
+					"
+					>
+						<img height="32" width="32" class="profile-photo" src={ profilePhotoSrc }/>
+					</button>
+					<div
+						class="katana-card topbar-dropdown"
+						id="account-dropdown"
+						tabindex="0"
+						style="display: none"
+						_="
+						  on blur
+						    log 'blur'
+						    hide me with *display
+						  on focusout 
+						    log 'focusout'
+						    hide me with *display
+						"
+					>
+						<button
+							hx-get="/me"
+							hx-target="#page-content"
+							hx-trigger="pointerdown"
+							hx-swap="innerHTML"
+							hx-push-url="true"
+						>
+							My Profile
+						</button>
+						<button
+							hx-get="/my-downloads"
+							hx-target="#page-content"
+							hx-trigger="pointerdown"
+							hx-swap="innerHTML"
+							hx-push-url="true"
+						>
+							My Downloads
+						</button>
+						<button
+							hx-get="/my-uploads"
+							hx-target="#page-content"
+							hx-trigger="pointerdown"
+							hx-swap="innerHTML"
+							hx-push-url="true"
+						>My Uploads</button>
+					</div>
+					<!--					<div id="account-dropdown" style="visibility: hidden;"></div> -->
+				</div>
+			}
+		</div>
+	</nav>
+}
+
+var topBarStylesHandle = templ.NewOnceHandle()
+
+templ TopBarStyles() {
+	@topBarStylesHandle.Once() {
+		<style id="topbar-styles" hx-preserve="true">
+  #topbar {
+    background-color: var(--dark-gray);
+    position: fixed;
+    z-index: 2;
+    height: 60px;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 30px;
+    display: flex;
+    align-items: center;
+    color: white;
+    padding-top: 7.5px;
+    padding-bottom: 7.5px;
+  }
+
+#topbar #logo {
+    font-family: Aileron;
+/*    letter-spacing: 1rem; */
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#logo-fm {
+    font-size: 20px;
+    color: orange;
+}
+
+  #topbar input[name=keyword] {
+    all: unset;
+    width: 350px;
+    height: 30px;
+    border-radius: 5px;
+    background-color: var(--input-color-1);
+    color: white;
+    padding: 4px;
+    padding-left: 10px;
+    cursor: text;
+  }
+
+  topbar>input[name=keyword]:focus {
+    border: 1px solid var(--hover-color-1);
+  }
+
+
+#topbar #create-profile-button {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 7px 13px;
+    border-radius: 3px;
+    transition: all 0.2s cubic-bezier(0.15, 0.83, 0.66, 1);
+    background-color: var(--cta-color);
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+#topbar #create-profile-button:hover {
+    background-color: #2895f7;
+}
+
+  #searchbar {
+    padding-left: 10px;
+    border-radius: 5px;
+    transition: all 0.2s cubic-bezier(0.15, 0.83, 0.66, 1);
+    outline: 2px solid rgba(255, 255, 255, 0);
+    position: relative;
+  }
+
+
+  #searchbar:focus-within {
+    outline: 2px solid rgba(255, 255, 255, 1);
+  }
+
+
+
+
+  #searchbar-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    padding-right: 10px;
+    position: relative;
+  }
+
+
+  #search-dropdown {
+	position: absolute;
+	width: 100%;
+	pointer-events: none;
+  }
+
+  #search-dropdown option {
+	display: none;
+  }
+
+  #search-dropdown-items { 
+        transform: translateY(calc(50% + 21px)) translateX(-10px);
+  }
+  .search-dropdown-item img {
+	width: 40px;
+	height: 40px;
+	max-width: 40px;
+	max-height: 40px;
+  }
+
+  .search-dropdown-item {
+	font-size: 12px;
+	cursor: pointer;
+	padding: 5px;
+	display: flex;
+	height: 50px;
+	background-color: var(--dark-gray);
+	pointer-events: all;
+}
+  
+  .search-dropdown-item:hover {
+	background-color: var(--input-color-1);
+}
+
+
+  .search-dropdown-item:focus {
+	background-color: var(--input-color-1);
+}
+
+  .search-dropdown-item:first-of-type {
+	border-radius: 5px 5px 0 0;
+  }
+  .search-dropdown-item:first-of-type img {
+	border-radius: 5px 0 0 0;
+  }
+
+  .search-dropdown-item:last-of-type {
+	border-radius: 0 0 5px 5px;
+}
+  .search-dropdown-item:last-of-type img{
+	border-radius: 0 0 0 5px;
+}
+
+.search-dropdown-info {
+	padding: 5px;
+}
+
+  #upload-button {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 7px 13px;
+    border-radius: 3px;
+/*    color: white; */
+/*    border: 1px solid white; */
+    background-color: white;
+    color: var(--dark-gray);
+    justify-self: end;
+    transition: all 0.2s cubic-bezier(0.15, 0.83, 0.66, 1);
+
+  }
+
+  #upload-button:hover {
+    background-color: #5c5c5c;
+  }
+
+  #top-bar-right {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    position: relative; 
+    height: 35px;
+    position: relative; 
+  }
+
+  #top-bar-right #far-right-object {
+	position: relative;
+	height: 100%;
+	aspect-ratio: 1;
+  }
+
+  #top-bar-right #far-right-object a {
+	height: 100%;
+	display: flex;
+	align-items: center;
+  }
+
+  #profile-photo-button {
+    position: relative;
+    cursor: pointer;
+    max-height:100%;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    transition: all 0.2s cubic-bezier(0.15, 0.83, 0.66, 1);
+    outline: 3px solid rgba(255, 255, 255, 0);
+  }
+
+  #profile-photo-button:hover {
+    outline: 3px solid rgba(255, 255, 255, 1);
+}
+
+  #topbar .icon {
+    position: relative;
+    bottom: 1px;
+    width: 15px;
+    height: 15px;
+  }
+</style>
+	}
+}

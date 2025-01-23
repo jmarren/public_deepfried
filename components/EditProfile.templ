@@ -1,0 +1,270 @@
+package components
+
+import (
+	"github.com/jmarren/deepfried/services"
+	"github.com/jmarren/deepfried/util"
+)
+
+/*
+	NEEDS
+	- Bio
+	- ProfilePhotoSrc
+	- Username
+*/
+
+templ EditProfileError(msg string) {
+	<div id="edit-profile-error">{ msg }</div>
+}
+
+templ EditProfile(user *services.User, profilePhotoSrc string, bio string) {
+	<head hx-head="append">
+		<link href={ util.GetStaticSrc("css/edit_profile.css") } rel="stylesheet" type="text/css"/>
+		<script src={ util.GetStaticSrc("js/edit_profile.js") }></script>
+	</head>
+	<form id="edit-profile-form" class="component-fade-in" hx-on:click="event.stopPropagation()" hx-patch="/users" hx-target="#page-content" hx-encoding="multipart/form-data">
+		<div id="profile-photo-container">
+			<div id="change-profile-button-container">
+				<label class="input-label" for="profile-photo-input">
+					change
+				</label>
+				<input
+					type="file"
+					name="profile-photo-input"
+					id="profile-photo-input"
+					hx-on:input="showNewProfileImage(this, event)"
+					accept="image/*"
+				/>
+			</div>
+			<img width="120" height="120" src={ profilePhotoSrc } class="profile-photo"/>
+		</div>
+		<div class="input-container">
+			<label for="username">username</label>
+			<input type="text" class="input-field" name="username" placeholder={ user.Username }/>
+		</div>
+		<div class="input-container">
+			<label for="bio">bio</label>
+			<textarea type="text" class="input-field" name="bio" placeholder={ bio }></textarea>
+		</div>
+		<div class="input-container" id="profile-photo-input-container">
+			<div id="profile-photo-input-left"></div>
+			<div id="selected-photo-container">
+				<img id="selected-photo"/>
+			</div>
+		</div>
+		<div id="edit-profile-error"></div>
+		<div id="edit-profile-buttons">
+			<button id="cancel-edit-profile-button" hx-on:click="event.preventDefault(); htmx.find('#modal').innerHTML = ''">Cancel</button>
+			<button id="save-changes-button" type="submit">Save</button>
+		</div>
+	</form>
+}
+
+var EditProfileHeadOnce = templ.NewOnceHandle()
+
+templ EditProfileHead() {
+	@EditProfileHeadOnce.Once() {
+		<script id="edit-profile-script">
+
+		function setEditProfileError(msg) {
+			htmx.find("#edit-profile-error").innerHTML = msg
+		}
+
+		function clearEditProfileError() {
+			htmx.find("#edit-profile-error").innerHTML = ""
+		}
+
+		function showNewProfileImage(elt, e) {
+			const file = elt.files[0]
+			console.log(file)
+			console.log(file.type)
+			if (file.type.indexOf("image/") !== 0) {
+				setEditProfileError("profile photo must be an image")
+			} else if (file.size >= 1000000) {
+				setEditProfileError("profile photo must be less than 1mb")
+			} else {
+				clearEditProfileError() 
+			} 
+			const fileReader = new FileReader()
+			fileReader.readAsDataURL(file)
+			const imageElt = htmx.find("#profile-photo-container img")
+			htmx.on(fileReader, "load", () => {
+				imageElt.src = fileReader.result
+				imageElt.className = "profile-photo"
+			})
+		}
+	</script>
+		<style id="edit-profile-styles">
+#edit-profile-form {
+	overflow: hidden;
+	width: fit-content;
+	display: flex;
+	 flex-direction: column;
+	 align-items: center;
+	 justify-content: center;
+	gap: 15px;
+	padding: 30px 40px 20px 40px;
+	 background-color: #ffffff;
+	 box-shadow: 0px 106px 42px rgba(0, 0, 0, 0.01),
+		 0px 59px 36px rgba(0, 0, 0, 0.05), 0px 26px 26px rgba(0, 0, 0, 0.09),
+		 0px 7px 15px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
+	 border-radius: 11px;
+	 font-family: "Inter", sans-serif;
+}
+
+#profile-photo-container {
+	aspect-ratio: 1;
+	max-height: 120px;
+	max-width: 120px;
+	position: relative;
+}
+
+
+#edit-profile-form #profile-photo-container:hover img {
+	filter: blur(1px);
+}
+
+#edit-profile-form #profile-photo-container #change-profile-button-container {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#edit-profile-form #profile-photo-container:hover label {
+	visibility: visible;
+	z-index: 2;
+}
+
+		
+  #edit-profile-form .input-container {
+    width: 100%;
+    height: fit-content;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+
+ #edit-profile-form .input-label {
+    font-size: 0.75rem;
+    color: #8B8E98;
+    font-weight: 600;
+  }
+
+   
+ #edit-profile-form textarea.input-field {
+	padding: 10px 0 0 10px;
+ } 
+
+ #edit-profile-form .input-field {
+    width: auto;
+    height: 40px;
+    padding: 0 0 0 10px;
+    border-radius: 7px;
+    outline: none;
+    border: 1px solid #e5e5e5;
+    filter: drop-shadow(0px 1px 0px #efefef) drop-shadow(0px 1px 0.5px rgba(239, 239, 239, 0.5));
+    transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  }
+
+ #edit-profile-form .input-field:focus {
+    border: 1px solid transparent;
+    box-shadow: 0px 0px 0px 2px #242424;
+    background-color: transparent;
+  }
+
+#edit-profile-form label[for="profile-photo-input"] {
+    font-size: 0.75rem;
+    color: #8B8E98;
+    padding: 2px 4px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 7px;
+    outline: none;
+    cursor: pointer;
+    background-color: white;
+    border: 1px solid white;
+    filter: drop-shadow(0px 1px 0px #efefef) drop-shadow(0px 1px 0.5px rgba(239, 239, 239, 0.5));
+    transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  }
+
+ #edit-profile-form label[for="profile-photo-input"]:hover {
+    background-color: #eef0ed;
+  }
+
+ #edit-profile-form input[type="file"] {
+    opacity: 0%;
+    width: 0;
+    height: 0;
+  }
+
+ #edit-profile-form #profile-photo-input-container { 
+	display: flex;
+	flex-direction: row;
+	height: 40px;
+	gap: 20px;
+  }
+
+ #edit-profile-form #selected-photo-container {
+	aspect-ratio: 1;
+	height: 100%;
+	max-width: 20px;
+  }
+
+ #edit-profile-form #profile-photo-input-left {
+	flex-grow: 1;
+  }
+
+  #edit-profile-form #edit-profile-buttons {
+	display: flex;
+	flex-direction: row;
+	gap: 4px;
+	width: 100%;
+  } 
+
+
+  #edit-profile-form #edit-profile-buttons button {
+	border-radius: 5px;
+	min-width: 8em;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	flex-grow: 1;
+	text-align: center;
+
+}
+
+  #edit-profile-form #edit-profile-buttons #save-changes-button {
+	background-color: var(--dark-gray);
+	color: white;
+	border: 2px solid var(--dark-gray);
+}
+
+
+  #edit-profile-form #edit-profile-buttons #save-changes-button:hover {
+	background-color: darkgray;
+	color: var(--dark-gray);
+  }
+
+  #edit-profile-form #edit-profile-buttons #cancel-edit-profile-button {
+	background-color: white;
+	border: 2px solid var(--dark-gray);
+	color: black;
+  }
+
+
+  #edit-profile-form #edit-profile-buttons #cancel-edit-profile-button:hover {
+	background-color: lightgray;
+	border: 2px solid var(--dark-gray);
+	color: black;
+  }
+
+	</style>
+	}
+}

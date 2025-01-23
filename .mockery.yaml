@@ -1,0 +1,14 @@
+with-expecter: True
+packages:
+  github.com/jmarren/deepfried/handlers:
+    interfaces:
+      TagService:
+        config:
+          dir: "{{.InterfaceDir}}"
+          mockName: MockTagService
+          inpackage: True
+      UserService:
+        config:
+          dir: "{{.InterfaceDir}}"
+          mockName: MockUserService
+          inpackage: True

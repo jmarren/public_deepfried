@@ -1,0 +1,95 @@
+package components
+
+import "github.com/jmarren/deepfried/services"
+
+templ JustAddedSection(j []*services.PlayableElt) {
+	<div id="just-added-card" class="">
+		<div id="just-added-header">Just Added</div>
+		for _, item := range j {
+			@CarouselCardBody(item)
+		}
+	</div>
+}
+
+/*
+			<div class=" katana-card track-card-container just-added-card fade-in-slowly">
+				<div class="card-initial">
+					<button
+						class="playable"
+						hx-get="/player"
+						hx-target="#player"
+						hx-audio={ item.ID.String() }
+						hx-audio-toggle-fx="class white-track-card"
+						hx-audio-toggle-target="closest .track-card-container"
+						hx-swap="outerHTML"
+					>
+						<img class="artwork" src={ item.ArtworkSrc }/>
+					</button>
+					<div class="track-info">
+						<span class="item.profile-image-container">
+							<img class="profile-photo-small profile-photo" src={ item.ProfilePhotoSrc }/>
+						</span>
+						<span class="track-info-right">
+							<span
+								class="card-title clickable-text"
+								hx-trigger="click"
+								hx-get={ fmt.Sprintf("%s/%s", item.Username, item.Title) }
+								hx-target="#page-content"
+								hx-push-url="true"
+							>{ item.Title }</span>
+							<span
+								class="item.username clickable-text"
+								hx-get={ fmt.Sprintf("/%s", item.Username) }
+								hx-target="#page-content"
+								hx-push-url="true"
+							>
+								{ item.Username }
+							</span>
+							<span class="item.bpm">
+								{ fmt.Sprintf("%d", item.Bpm) } bpm
+							</span>
+							<span class="spacer"></span>
+						</span>
+					</div>
+					if item.IsPlaying {
+						<div id="playing-indicator">
+							<div id="playing-indicator-content">
+								<div class="triangle-forward-container">
+									<div class="triangle control triangle-forward"></div>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+				<div id="extra-info"></div>
+			</div>
+		}
+	</div>
+}
+*/
+
+templ JustAddedSectionHead() {
+	<style id="featured-section-tags">
+	#just-added-card {
+	    border: 1px solid #32363d;
+	    border-radius: 10px;
+	    color: white;
+	    font-family: Inter;
+	    position: relative;
+	    width: 200px;
+	    margin-left: 10px;
+	}
+
+	#just-added-header {
+		position: absolute;
+		top: -0.5em;
+		left: -0.5em;
+		font-weight: 600;
+		font-size: 12px;
+		padding: 2px 8px;
+		color: var(--dark-gray);
+		background-color: white;
+		border-radius: 4px;
+	}
+</style>
+}

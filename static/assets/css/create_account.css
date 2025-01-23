@@ -1,0 +1,148 @@
+
+  #create-account-form {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 50px 40px 20px 40px;
+    background-color: black;
+    border: 1px solid white;
+    font-family: "Inter", sans-serif;
+  }
+
+
+
+ #create-account-form .title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  #create-account-form .title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  #create-account-form .subtitle {
+    font-size: 0.725rem;
+    max-width: 80%;
+    text-align: center;
+    line-height: 1.1rem;
+    color: #8B8E98
+  }
+
+
+
+ #create-account-form .input-container {
+    width: 100%;
+    height: fit-content;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+
+
+ #create-account-form .icon {
+    width: 20px;
+    position: absolute;
+    z-index: 99;
+    left: 12px;
+    bottom: 9px;
+  }
+
+ #create-account-form .input-label {
+    font-size: 0.75rem;
+    color: #8B8E98;
+    font-weight: 600;
+  }
+
+ #create-account-form .input-field {
+    width: auto;
+    height: 40px;
+    padding: 0 0 0 40px;
+    border-radius: 7px;
+    outline: none;
+    border: 1px solid #e5e5e5;
+    filter: drop-shadow(0px 1px 0px #efefef) drop-shadow(0px 1px 0.5px rgba(239, 239, 239, 0.5));
+    transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  }
+
+ #create-account-form .input-field:focus {
+    outline: 1px solid gray;
+  }
+
+  .create-account-btn {
+    text-align: center;
+    width: 100%;
+    height: 40px;
+    border: 0;
+    background: var(--cta-color);
+    border-radius: 7px;
+    outline: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  }
+
+ #create-account-form label[for="profile-photo-input"] {
+    font-size: 0.75rem;
+    color: #8B8E98;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 7px;
+    outline: none;
+    cursor: pointer;
+    border: 1px solid #e5e5e5;
+    /* filter: drop-shadow(0px 1px 0px #efefef) drop-shadow(0px 1px 0.5px rgba(239, 239, 239, 0.5)); */
+    transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+    color: #8B8E98;
+  }
+
+ #create-account-form label[for="profile-photo-input"]:hover {
+    background-color: #eef0ed;
+  }
+
+ #create-account-form input[type="file"] {
+    opacity: 0%;
+    width: 0;
+    height: 0;
+  }
+
+ #create-account-form #profile-photo-input-container { 
+	display: flex;
+	flex-direction: row;
+	height: 40px;
+	gap: 20px;
+  }
+
+ #create-account-form #selected-photo-container {
+	aspect-ratio: 1;
+	height: 100%;
+  }
+
+ #create-account-form #profile-photo-input-left {
+	flex-grow: 1;
+  }
+
+ #create-account-form .create-account-btn:hover {
+    background-color: white;
+    color: black;
+  }
+
+#modal {
+	display: block !important;
+}

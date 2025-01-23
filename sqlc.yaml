@@ -1,0 +1,41 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: ["db/sql/users.sql", "db/sql/audio_files.sql", "db/sql/schema.sql", "db/sql/pins.sql", "db/sql/following.sql", "db/sql/tags.sql", "db/sql/search.sql", "db/sql/featured_track.sql", "db/sql/restart.sql", "db/sql/stems.sql", "db/sql/feed.sql", "db/sql/downloads.sql"]
+    schema: "db/sql/schema.sql"
+    gen:
+      go:
+        package: "sqlc"
+        out: "sqlc"
+        sql_package: "pgx/v5"
+        # emit_interface: true
+        overrides:
+          - db_type:  "musical_key"
+            go_type:
+              import: "github.com/jmarren/deepfried/consts"
+              type: "MusicalKey"
+          - db_type: "musical_key_signature"
+            go_type:
+              import: "github.com/jmarren/deepfried/consts"
+              type: "MusicalKeySignature"
+          - db_type: "major_minor"
+            go_type:
+              import: "github.com/jmarren/deepfried/consts"
+              type: "MajorMinor"
+          - column: "audio_file_tag_arrays.tag_array"
+            go_type: 
+              type: "string"
+              slice: true
+          - column:  "user_pins.tag_array"
+            go_type: 
+              type: "string"
+              slice: true
+          - column:  "audio_file_search_rows.tag_array"
+            go_type: 
+              type: "string"
+              slice: true
+          - column:  "stem_arrays.stem_file_names"
+            go_type: 
+              type: "string"
+              slice: true
+              

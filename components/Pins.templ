@@ -1,0 +1,80 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/services"
+	"github.com/jmarren/deepfried/util"
+)
+
+templ Pin(pin *services.Pin) {
+	<div class="pin katana-card">
+		<img
+			height="100"
+			width="100"
+			src={ pin.ArtworkSrc }
+		/>
+		<div class="pin-info">
+			<div
+				class="pin-title"
+				hx-trigger="click"
+				hx-get={ fmt.Sprintf("/%s/%s", pin.Username, pin.Title) }
+				hx-target="#page-content"
+				hx-push-url="true"
+			>
+				{ pin.Title }
+			</div>
+			<div class="pin-sub">
+				<div class="pin-sub-sans-button">
+					<!--
+					<div class="pin-stats">
+						<div class="pin-bpm">1:34</div>
+						<div class="pin-bpm">78 bpm</div>
+					</div>
+				-->
+					<div class="pin-tags">
+						for _, tag := range pin.Tags {
+							<div class="pin-tag">{ tag }</div>
+						}
+					</div>
+				</div>
+				<button
+					class="play-button featured-section playable"
+					id={ pin.EltId }
+					hx-get="/player"
+					hx-target="#player"
+					hx-swap="outerHTML"
+					hx-audio={ util.UuidString(pin.ID) }
+					hx-audio-toggle-fx="innerHTML playtriangle pausebars"
+					data-audio-src={ pin.AudioSrc }
+					data-audio-user={ pin.Username }
+					data-audio-title={ pin.Title }
+					data-playbutton-type="triangle-bars"
+					data-img-src={ pin.ArtworkSrc }
+					class="play-button feed-page playable"
+				>
+					if pin.IsPlaying {
+						<div class="pause-bars">
+							<div class="pause-bar"></div>
+							<div class="pause-bar"></div>
+						</div>
+					} else {
+						<div class="play-triangle"></div>
+					}
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ Pins(data []*services.Pin) {
+	if len(data) > 0 {
+		<section id="pin-section">
+			<h2 class="section-title">pinned</h2>
+			<div id="pin-container">
+				for _, pin := range data {
+					@Pin(pin)
+				}
+			</div>
+		</section>
+	}
+}

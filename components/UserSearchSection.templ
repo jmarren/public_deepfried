@@ -1,0 +1,31 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/services"
+)
+
+templ UserSearchSectionBody(s *services.UserSearchResults) {
+	<div class="search-section-title">users</div>
+	<div id="user-search-results">
+		for _, userRes := range s.Users {
+			<div class="user-result-card katana-card">
+				<img
+					width="100"
+					height="100"
+					src={ userRes.ProfilePhotoSrc }
+					class="user-result-photo"
+				/>
+				<div
+					class="user-result-username clickable-text"
+					hx-get={ fmt.Sprintf("/%s", userRes.Username) }
+					hx-target="#page-content"
+					hx-push-url="true"
+				>
+					{ userRes.Username }
+				</div>
+				<div class="user-result-bio">{ userRes.Bio.String } </div>
+			</div>
+		}
+	</div>
+}

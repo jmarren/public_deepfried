@@ -1,0 +1,243 @@
+package components
+
+import "github.com/jmarren/deepfried/util"
+
+templ CreateAccount() {
+	<head hx-head="append">
+		<link href={ util.GetStaticSrc("css/create_account.css") } rel="stylesheet" type="text/css"/>
+		<script hx-preserve="true" src={ util.GetStaticSrc("js/create_account.js") }></script>
+	</head>
+	<form id="create-account-form" class="component-fade-in" hx-on:click="event.stopPropagation()" hx-post="/users" hx-encoding="multipart/form-data">
+		<div class="title-container">
+			<p class="title">Create Your Profile</p>
+			<span class="subtitle">
+				Let's get some more information
+			</span>
+		</div>
+		<br/>
+		<div class="input-container">
+			<label class="input-label" for="username-field">Username</label>
+			@UserIcon()
+			<input
+				placeholder="myusername"
+				title="Input title"
+				name="username"
+				type="username"
+				class="input-field"
+				id="username-field"
+				required
+				minlength="8"
+				maxlength="20"
+			/>
+		</div>
+		<div class="input-container" id="profile-photo-input-container">
+			<div id="profile-photo-input-left">
+				<label for="profile-photo-input">
+					Select Profile
+					Photo
+				</label>
+				<input
+					type="file"
+					name="profile-photo-input"
+					id="profile-photo-input"
+					hx-on:input="showSelectedProfileImage(this, event)"
+					required
+					accept="image/*"
+				/>
+			</div>
+			<div id="selected-photo-container">
+				<img id="selected-photo"/>
+			</div>
+		</div>
+		<div id="create-profile-error"></div>
+		<button title="Create" type="submit" class="create-account-btn">
+			<span>Create</span>
+		</button>
+	</form>
+}
+
+var createAccountHeadHandle = templ.NewOnceHandle()
+
+templ CreateAccountHead() {
+	@createAccountHeadHandle.Once() {
+		<script id="create-account-script">
+		
+		function setCreateProfileError(msg) {
+			htmx.find("#create-profile-error").innerHTML = msg
+		}
+
+		function clearCreateProfileError() {
+			htmx.find("#create-profile-error").innerHTML = ""
+		}
+
+		function showSelectedProfileImage(elt, e) {
+			const file = elt.files[0]
+			console.log(file)
+			console.log(file.type)
+			if (file.type.indexOf("image/") !== 0) {
+				setCreateProfileError("profile photo must be an image")
+			} else if (file.size >= 1000000) {
+				setCreateProfileError("profile photo must be less than 1mb")
+			} else {
+				clearCreateProfileError() 
+			} 
+			const fileReader = new FileReader()
+			fileReader.readAsDataURL(file)
+			const imageElt = htmx.find("#selected-photo")
+			htmx.on(fileReader, "load", () => {
+				imageElt.src = fileReader.result
+				imageElt.className = "profile-photo"
+			})
+		}
+	</script>
+		<style id="create-account-styles">
+  #create-account-form {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 50px 40px 20px 40px;
+    background-color: #ffffff;
+    box-shadow: 0px 106px 42px rgba(0, 0, 0, 0.01),
+      0px 59px 36px rgba(0, 0, 0, 0.05), 0px 26px 26px rgba(0, 0, 0, 0.09),
+      0px 7px 15px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
+    border-radius: 11px;
+    font-family: "Inter", sans-serif;
+  }
+
+
+
+  .title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #212121;
+  }
+
+  .subtitle {
+    font-size: 0.725rem;
+    max-width: 80%;
+    text-align: center;
+    line-height: 1.1rem;
+    color: #8B8E98
+  }
+
+
+
+  .input-container {
+    width: 100%;
+    height: fit-content;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+
+
+  .icon {
+    width: 20px;
+    position: absolute;
+    z-index: 99;
+    left: 12px;
+    bottom: 9px;
+  }
+
+  .input-label {
+    font-size: 0.75rem;
+    color: #8B8E98;
+    font-weight: 600;
+  }
+
+  .input-field {
+    width: auto;
+    height: 40px;
+    padding: 0 0 0 40px;
+    border-radius: 7px;
+    outline: none;
+    border: 1px solid #e5e5e5;
+    filter: drop-shadow(0px 1px 0px #efefef) drop-shadow(0px 1px 0.5px rgba(239, 239, 239, 0.5));
+    transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  }
+
+  .input-field:focus {
+    border: 1px solid transparent;
+    box-shadow: 0px 0px 0px 2px #242424;
+    background-color: transparent;
+  }
+
+  .create-account-btn {
+    text-align: center;
+    width: 100%;
+    height: 40px;
+    border: 0;
+    background: var(--cta-color);
+    border-radius: 7px;
+    outline: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  }
+
+  label[for="profile-photo-input"] {
+    font-size: 0.75rem;
+    color: #8B8E98;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 7px;
+    outline: none;
+    cursor: pointer;
+    border: 1px solid #e5e5e5;
+    filter: drop-shadow(0px 1px 0px #efefef) drop-shadow(0px 1px 0.5px rgba(239, 239, 239, 0.5));
+    transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+    color: #8B8E98;
+  }
+
+  label[for="profile-photo-input"]:hover {
+    background-color: #eef0ed;
+  }
+
+  input[type="file"] {
+    opacity: 0%;
+    width: 0;
+    height: 0;
+  }
+
+  #profile-photo-input-container { 
+	display: flex;
+	flex-direction: row;
+	height: 40px;
+	gap: 20px;
+  }
+
+  #selected-photo-container {
+	aspect-ratio: 1;
+	height: 100%;
+  }
+
+  #profile-photo-input-left {
+	flex-grow: 1;
+  }
+
+  .create-account-btn:hover {
+    background-color: #2bad2b;
+  }
+</style>
+	}
+}

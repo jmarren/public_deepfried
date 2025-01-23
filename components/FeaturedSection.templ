@@ -1,0 +1,260 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/services"
+)
+
+templ FeaturedSectionBody(p *services.PlayableElt) {
+	<div id="featured-track-card" class="katana-card fade-in-slowly">
+		<img
+			width="200"
+			height="200"
+			class="artwork"
+			src={ p.ArtworkSrc }
+		/>
+		<div></div>
+		<div id="featured-description">
+			<div id="featured-row-1">
+				<div id="name-and-artist">
+					<h2
+						id="featured-title"
+						hx-trigger="click"
+						hx-get={ fmt.Sprintf("/%s/%s", p.Username, p.Title) }
+						hx-target="#page-content"
+						hx-push-url="true"
+					>
+						{ p.Title }
+					</h2>
+					<h3
+						hx-get={ fmt.Sprintf("/%s", p.Username) }
+						hx-target="#page-content"
+						hx-push-url="true"
+					>
+						{ p.Username }
+					</h3>
+				</div>
+			</div>
+			<div id="featured-row-2">
+				<p id="featured-tags">
+					for _, tag := range p.Tags {
+						<button>{ tag }</button>
+					}
+				</p>
+				<!-- 
+				<p>
+					{ p.Description }
+				</p>
+				-->
+			</div>
+			<div id="featured-row-2"></div>
+			<div id="featured-bottom-buttons">
+				<button
+					class="play-button featured-section playable"
+					id={ p.EltId }
+					hx-audio={ p.ID.String() }
+					hx-audio-toggle-fx="innerHTML playtriangle pausebars"
+					preload="mouseover"
+					preload-images="true"
+					class="play-button feed-page playable"
+				>
+					if p.IsPlaying {
+						<div class="pause-bars">
+							<div class="pause-bar"></div>
+							<div class="pause-bar"></div>
+						</div>
+					} else {
+						<div class="play-triangle"></div>
+					}
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ FeaturedSectionStyles() {
+	<style id="featured-section-tags">
+
+  #featured-title {
+    padding-right: 3px;
+    cursor: pointer;
+    }
+
+  #featured-row-2 button {
+    all: unset;
+    cursor: pointer;
+  }
+
+
+  #featured-track-card {
+    min-height: 200px;
+    padding: 20px;
+    margin-right: 10px;
+    display: flex;
+    max-width: 600px;
+  }
+
+  #featured-description {
+    height: 100%;
+    padding: 0px 10px 10px 20px;
+    flex-grow: 1;
+    flex-direction: column;
+    position: relative;
+    display:flex;
+  }
+
+  #featured-description h2 {
+    font-size: 30px;
+    color: white;
+  }
+
+  #featured-description h3 {
+    font-size: 16px;
+    padding-left: 0px;
+    color: #d1d1d1;
+    justify-self: end;
+  }
+
+  #featured-description h3:hover {
+    cursor: pointer;
+    color: white;
+  }
+
+
+  #featured-description hr {
+    background-color: var(--light-gray-1);
+    color: var(--light-gray-1);
+    height: 0.75px;
+    padding: 0;
+    margin-top: 0;
+    border: none;
+  }
+
+  #featured-row-1 {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #featured-track-card #name-and-artist {
+    width: 100%;
+  } 
+
+  #featured-track-card #name-and-artist h2, 
+  #featured-track-card #name-and-artist h3 {
+   display: block;
+   }
+
+  #featured-track-card>.track-image {
+    width: 200px;
+    height: 200px;
+    min-width: 200px;
+    min-height: 200px;
+/*    border-radius: 10px 0 0 10px; */
+  }
+
+  #featured-tags {
+    margin-top: 4px;
+  }
+
+  #featured-tags>button {
+    all: unset;
+    font-size: 0.8em;
+    margin: 2px 1px;
+    padding: 3px 5px;
+/*    background-color: var(--light-gray-1); */
+/*    color: #424742; */
+    color: white; 
+    border: 1px solid #222222;
+    border-radius: 4px;
+  }
+
+  #featured-track-card p {
+    color: #d1d1d1;
+    font-size: 0.7em;
+  }
+
+
+  #featured-track-card>.track-image>img {
+/*    border-radius: 10px 0 0 10px; */
+     border: 1px solid #25282d;
+     border-radius: 4px;
+  }
+
+  #featured-bottom-buttons {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    bottom: 4px;
+    flex-grow: 1;
+  }
+
+
+  #view-featured-profile-button {
+    all: unset;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 12px 10px;
+    border-radius: 3px;
+    background-color: var(--cta-color);
+    color: white;
+    transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  }
+
+  #view-featured-profile-button:hover {
+    background-color: white;
+    box-shadow: var(--dark-gray) 0 4px 15px; 
+    color: var(--dark-gray);
+  }
+
+
+  .featured-icon {
+    color: var(--light-gray-1);
+  }
+
+  .featured-icon:hover {
+    color: white;
+  }
+
+
+ #featured-track-card .play-button {
+    height: 25px;
+    width: 25px;
+    padding: 8px;
+    position: relative;
+    background-color: var(--cta-color);
+    border-radius: 100%;
+  }
+
+  #featured-track-card .play-button:hover {
+    background-color: #2895f7;
+  }
+
+
+
+   #featured-track-card .play-triangle {
+    height: 100%;
+    width: 100%;
+    clip-path: polygon(25% 20%, 31% 18%, 80% 39%, 83% 44%, 83% 51%, 81% 55%, 31% 82%, 25% 80%, 21% 75%, 21% 25%, 25% 20%);
+    background-color: white;
+  }
+
+
+   #featured-track-card .pause-bars {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 20%;
+  }
+
+#featured-track-card .pause-bars .pause-bar {
+	width: 20%;
+	height: 60%;
+	background-color: white;
+  }
+
+</style>
+}

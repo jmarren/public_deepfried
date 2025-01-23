@@ -1,0 +1,30 @@
+package components 
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/sqlc"
+)
+
+templ SearchDropdown(data []*sqlc.SearchKeywordForDropdownRow) {
+	<div id="search-dropdown-items">
+		for _, item := range data {
+			<div
+				class="search-dropdown-item"
+				hx-get={ fmt.Sprintf("/%s/%s", item.Username, item.Title) }
+				hx-target="#page-content"
+				hx-replace-url={ fmt.Sprintf("/%s/%s", item.Username, item.Title) }
+				hx-trigger="pointerdown"
+			>
+				<img src={ item.ArtworkSrc }/>
+				<div class="search-dropdown-info">
+					<div>
+						{ item.Title }
+					</div>
+					<div>
+						{ item.Username }
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+}

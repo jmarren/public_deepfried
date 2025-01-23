@@ -1,0 +1,66 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/util"
+)
+
+templ Upload(uploadId string) {
+	<head hx-head="append">
+		<link href={ util.GetStaticSrc("css/upload.css") } rel="stylesheet" type="text/css"/>
+	</head>
+	<input
+		hidden
+		id="file-input"
+		type="file"
+		name="audio_files"
+		required
+		accept="audio/*"
+		hx-get="/modal/upload-form"
+		hx-target="#upload-form"
+		hx-trigger="input"
+		hx-swap="outerHTML"
+		hx-file-upload
+		hx-file-upload-type="audio"
+		hx-file-upload-id={ uploadId }
+	/>
+	<input
+		hidden
+		hx-file-upload
+		hx-file-upload-type="artwork"
+		hx-file-upload-id={ uploadId }
+		type="file"
+		hx-on:input="ShowArtwork(this)"
+		name="artwork"
+		accept="image/*"
+	/>
+	for i := 0; i < 5; i++ {
+		<input
+			hidden
+			hx-file-upload
+			hx-file-upload-type="stems"
+			hx-file-upload-id={ fmt.Sprintf("%s-%d", uploadId, i) }
+			type="file"
+			name={ fmt.Sprintf("stems-%d", i) }
+		/>
+	}
+	<div id="upload-form" class="katana-card component-fade-in">
+		<span>Choose an audio file to upload</span>
+		<div id="drop-zone-container" hx-on:click="event.preventDefault(); htmx.find('#file-input').click()">
+			<div
+				hx-upload-drop-zone="#file-input"
+				id="drop-zone"
+				hx-on:dragover="event.preventDefault();"
+				hx-on:dragenter="event.preventDefault()"
+				hx-on:drop="event.preventDefault(); HandleDrop(event);"
+				hx-upload-error="#upload-error"
+			>
+				Drop here
+				<br/>
+				or 
+				<label for="audio_files">Select File</label>
+			</div>
+		</div>
+		<div id="upload-error"></div>
+	</div>
+}

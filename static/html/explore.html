@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Practice</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+  <!-- <script src="/static/" type="text/javascript"></script> -->
+  <style>
+    h1,
+    h2,
+    h3,
+    button {
+      all: unset;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+
+    :root {
+      --main-background-color: #0d182b;
+      --secondary-background-color: white;
+      --border-color-1: #e1e3e3;
+      --hover-color-1: #d9d1cc;
+      --text-color-1: black;
+      --light-gray-1: #969284;
+      --light-gray-2: #d1d1d1;
+      --input-color-1: #454545;
+      --player-height: 100px;
+      --medium-image-size: 100px;
+    }
+
+
+    body {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      font-family: Arial;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin-bottom: var(--player-height);
+      background-color: #f7f7f7;
+    }
+
+    #topbar {
+      background-color: #00041c;
+      height: 60px;
+      padding-left: 15px;
+      padding-right: 30px;
+      display: flex;
+      align-items: center;
+      color: white;
+      padding-top: 7.5px;
+      padding-bottom: 7.5px;
+    }
+
+
+    #sidebar {
+      left: 0;
+      height: 100%;
+      top: 60px;
+      border-right: 1px solid var(--border-color-1);
+      width: 150px;
+      padding-right: 4px;
+      padding-top: 2.5px;
+      font-family: Arial;
+      font-size: 13px;
+      color: var(--text-color-1);
+    }
+
+    #sidebar>div {
+      padding-top: 7.5px;
+      padding-bottom: 7.5px;
+      padding-left: 20px;
+      line-height: 1.2em;
+      margin: 5px 0;
+      border-radius: 3px;
+      margin-left: 4px;
+    }
+
+    #sidebar>div:hover {
+      background-color: var(--hover-color-1);
+      cursor: pointer;
+    }
+
+    #topbar input[type=text] {
+      all: unset;
+      width: 350px;
+      height: 30px;
+      border-radius: 5px;
+      background-color: var(--input-color-1);
+      color: white;
+      padding: 4px;
+      padding-left: 10px;
+      cursor: text;
+    }
+
+    topbar>input[type=text]:focus {
+      border: 1px solid var(--hover-color-1);
+    }
+
+    #page {
+      display: flex;
+      position: relative;
+      flex-grow: 1;
+      flex-direction: row;
+    }
+
+    #page-content {
+      overflow-x: hidden;
+      height: 100%;
+      width: calc(100vw - 155px);
+      padding-left: 25px;
+      padding-top: 10px;
+      left: 240px;
+      color: var(--light-gray-1);
+    }
+
+
+    #hero-and-featured {
+      min-width: 555px;
+      width: calc(100vw - 285px);
+    }
+
+    #hero {
+      display: flex;
+      justify-content: start;
+      padding: 40px 0 40px 0;
+    }
+
+    .track-card {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card-carousel {
+      min-width: 500px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      padding: 15px;
+      overflow-x: hidden;
+    }
+
+    #featured-track {
+      padding-left: 10px;
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: center;
+      max-height: 312px;
+      min-width: 800px;
+      box-sizing: border-box;
+    }
+
+    #featured-row-2 button {
+      all: unset;
+      cursor: pointer;
+    }
+
+
+    #featured-track-card {
+      box-shadow: 0px -10px 40px -20px orange;
+      padding-right: 20px;
+      margin-right: 10px;
+      display: flex;
+      width: 100%;
+      border: 1px solid black;
+      background: linear-gradient(45deg, black, orange);
+      border-radius: 10px;
+    }
+
+    #featured-description {
+      margin: 20px;
+      padding: 10px;
+      flex-grow: 1;
+      flex-direction: column;
+    }
+
+    #featured-description h2 {
+      font-size: 40px;
+      color: white;
+    }
+
+    #featured-description h3 {
+      font-size: 20px;
+      padding-left: 0px;
+      color: #d1d1d1;
+    }
+
+    #featured-description h3:hover {
+      cursor: pointer;
+      color: white;
+    }
+
+    hr {
+      color: var(--border-color-1);
+      background-color: var(--border-color-1);
+      border: none;
+      height: 1px;
+    }
+
+
+    #featured-description hr {
+      background-color: var(--light-gray-1);
+      color: var(--light-gray-1);
+      height: 0.75px;
+      border: none;
+    }
+
+    #featured-row-1 {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+    }
+
+    #featured-track-card>.track-card {
+      width: 300px;
+      height: 300px;
+      min-width: 300px;
+      min-height: 300px;
+      border-radius: 10px 0 0 10px;
+    }
+
+    #featured-tags {
+      margin-top: 0px;
+    }
+
+    #featured-tags>button {
+      all: unset;
+      margin: 2px 1px;
+      padding: 3px 5px;
+      background-color: var(--light-gray-1);
+      color: #424742;
+      border-radius: 4px;
+    }
+
+    #featured-tags>button:hover {
+      background-color: white;
+      cursor: pointer;
+    }
+
+    #featured-track p {
+      color: #d1d1d1;
+    }
+
+    .track-card-container {
+      font-family: Inter;
+      font-weight: bold;
+      font-size: 10px;
+      padding: 5px 5px 5px 5px;
+      border-radius: 10px;
+      background-color: #dce0dc;
+      color: #5f6b5f;
+    }
+
+    .track-card-container .track-info {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px;
+      flex-direction: column;
+    }
+
+    .track-card-container .bpm {
+      color: #8a918a;
+    }
+
+
+    .card-carousel .track-card {
+      width: var(--medium-image-size);
+      height: var(--medium-image-size);
+      min-width: var(--medium-image-size);
+      min-height: var(--medium-image-size);
+      border-radius: 10px;
+    }
+
+    #featured-track-card>.track-card>img {
+      border-radius: 10px 0 0 10px;
+    }
+
+    .card-carousel .track-card>img {
+      border-radius: 10px;
+    }
+
+    #player .track-card {
+      width: 100px;
+      height: 100px;
+      min-width: 75px;
+      min-height: 75px;
+    }
+
+
+    .track-card>img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #hero h2 {
+      color: var(--light-gray-1);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 50px;
+      color: var(--text-color-1);
+      font-family: Inter;
+      font-weight: bold;
+    }
+
+
+    h2 {
+      font-size: 16px;
+      color: var(--text-color-1);
+      font-family: Archivo Black;
+    }
+
+    h3 {
+      padding-left: 7.5px;
+      font-size: 13px;
+      color: var(--light-gray-1);
+    }
+
+    .featured-icon {
+      color: var(--light-gray-1);
+    }
+
+    .featured-icon:hover {
+      color: white;
+    }
+
+
+    .play-button {
+      position: relative;
+      background-color: white;
+      width: 33%;
+      height: 33%;
+      clip-path: circle(50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 65%;
+    }
+
+    .play-button:hover {
+      background-color: gray;
+      cursor: pointer;
+    }
+
+    .play-triangle {
+      position: absolute;
+      background-color: black;
+      height: 100%;
+      width: 100%;
+      clip-path: polygon(40% 33%, 66% 50%, 40% 66%, 40% 33%);
+    }
+
+    #hero-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #hero-text h2 {
+      padding: 0;
+    }
+
+    .icon-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    #sidebar .icon,
+    #topbar .icon {
+      position: relative;
+      bottom: 1px;
+      width: 15px;
+      height: 15px;
+    }
+
+
+    #player {
+      position: fixed;
+      width: 100%;
+      bottom: 0px;
+      z-index: 1;
+      border-top: 1px solid gray;
+      background: linear-gradient(0deg, #d7dbfc, white 30%);
+      height: var(--player-height);
+      display: flex;
+      align-items: center;
+    }
+
+    #playback-time-bar {
+      flex-grow: 1;
+      height: 5px;
+      background-color: #c8d2db;
+      border-radius: 2.5px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    #tag-container {
+      overflow-x: hidden;
+      overflow: hidden;
+      max-height: 2em;
+      margin-bottom: 10px;
+    }
+
+    #tag-container button {
+      all: unset;
+      margin: 2px 1px;
+      padding: 3px 5px;
+      cursor: pointer;
+      background-color: white;
+      border: 1px solid var(--light-gray-1);
+      border-radius: 4px;
+      color: #545454;
+      font-weight: bold;
+    }
+
+    #tag-container button:hover {
+      background-color: var(--light-gray-2);
+    }
+
+    #upload-button {
+      all: unset;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 5px 7.5px;
+      border-radius: 3px;
+      background-color: limegreen;
+      color: white;
+      justify-self: end;
+    }
+
+    #upload-button:hover {
+      background-color: #2cb82c;
+    }
+
+    #view-featured-profile-button {
+      all: unset;
+      margin-top: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 5px 7.5px;
+      border-radius: 3px;
+      background-color: limegreen;
+      color: white;
+    }
+
+    #view-featured-profile-button:hover {
+      background-color: #2cb82c;
+    }
+
+
+    #time-1,
+    #time-2 {
+      padding: 10px;
+      font-size: 0.8em;
+      color: var(--text-color-1);
+      font-weight: bold;
+    }
+
+    #searchbar-container {
+      flex-grow: 1;
+      display: flex;
+      justify-content: start;
+    }
+
+    #playback-progress-marker {
+      height: 10px;
+      width: 10px;
+      background-color: black;
+      position: absolute;
+      left: 20px;
+      clip-path: circle(50% at 50% 50%);
+    }
+
+    #searchbar {
+      border: 2px solid limegreen;
+      padding-left: 10px;
+      background-color: limegreen;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+
+    .profile-photo {
+      object-fit: contain;
+      clip-path: circle(50% at 50% 50%);
+      width: 100%;
+      height: 100%;
+    }
+
+
+    #top-bar-right {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    #profile-photo-button {
+      height: 28px;
+      width: 28px;
+      position: relative;
+      cursor: pointer;
+    }
+  </style>
+
+
+</head>
+
+<script>
+  function expandCard(element) {
+    console.log(element);
+    if (element.style.marginRight == "300px") {
+      element.style.marginRight = "0px";
+    } else {
+      element.style.marginRight = "300px";
+    }
+  }
+
+  function toggleDarkMode() {
+    const rootStyle = document.documentElement.style;
+    if (rootStyle.getPropertyValue("--secondary-background-color") == "white") {
+      rootStyle.setProperty("--secondary-background-color", "black");
+      rootStyle.setProperty("--text-color-1", "white");
+    } else {
+      rootStyle.setProperty("--secondary-background-color", "white");
+      rootStyle.setProperty("--text-color-1", "black");
+    }
+  }
+</script>
+
+<body>
+
+  <!-- topbar -->
+  <nav id="topbar">
+    <div id="searchbar-container">
+      <div id="searchbar" class="icon-container">
+        <img class="icon" src="/static/assets/search.svg">
+        <input type="text" placeholder="search for music">
+      </div>
+    </div>
+    <!-- <button onclick="toggleDarkMode()">dark mode</button> -->
+    <div id="top-bar-right">
+      <button id="upload-button">
+        <div class="icon-container">
+          <svg id="Layer_1" height="16" fill="currentColor" viewBox="0 0 24 24" width="16"
+            xmlns="http://www.w3.org/2000/svg" data-name="Layer 1">
+            <path
+              d="m12 0a12 12 0 1 0 12 12 12.013 12.013 0 0 0 -12-12zm0 22a10 10 0 1 1 10-10 10.011 10.011 0 0 1 -10 10zm1-11h4v2h-4v4h-2v-4h-4v-2h4v-4h2z" />
+          </svg>
+          Upload
+        </div>
+      </button>
+      <button id="profile-photo-button">
+        <img class="profile-photo"
+          src="https://cf-simple-s3-origin-cloudfrontfors3-loophead-201993304606.s3.amazonaws.com/1725978573198-ba66f11e1257cab42597.png">
+      </button>
+    </div>
+  </nav>
+
+
+  <!-- player -->
+  <div id="player">
+    <div class="track-card">
+      <img src="https://d1ptp6rux3p5im.cloudfront.net/loop_artworks/1721832807511-27fdb9255bcc5b21ee27NaN.png">
+      <div class="play-button">
+        <div class="play-triangle">
+        </div>
+      </div>
+    </div>
+    <div id="time-1">0:30</div>
+    <div id="playback-time-bar">
+      <div id="playback-progress-marker"></div>
+    </div>
+    <div id="time-2">2:47</div>
+  </div>
+
+
+  <div id="page">
+
+    <!-- sidebar -->
+    <div>
+      <nav id="sidebar">
+        <div class="icon-container"><img class="icon" src="/static/assets/home.svg">My Feed</div>
+        <div class="icon-container"><img class="icon" src="/static/assets/globe.svg">Explore</div>
+      </nav>
+      <hr>
+      <!-- <div class="icon-container"><img class="icon" src="/static/assets/layers.svg">Open Submissions</div> -->
+    </div>
+    <div id="page-content">
+
+
+      <!-- hero and featured -->
+      <div id="tag-container">
+        <button>Pop Rap</button>
+        <button>The Weekend</button>
+        <button>Live Instruments</button>
+        <button>Supertrap</button>
+        <button>Accoustic Guitar</button>
+        <button>Kaytranada</button>
+        <button>Hip Hop</button>
+        <button>80s</button>
+        <button>90s</button>
+        <button>House</button>
+        <button>Dance</button>
+        <button>Drake</button>
+        <button>Pop</button>
+        <button>R&B</button>
+        <button>Jazz</button>
+      </div>
+      <div id="hero-and-featured">
+        <!-- <section id="hero"> -->
+        <!--   <div id="hero-text"> -->
+        <!--     <h1> -->
+        <!--       Find What's Hot -->
+        <!--     </h1> -->
+        <!--     <h2>An Open Loop Marketplace</h2> -->
+        <!--   </div> -->
+        <!-- </section> -->
+
+        <section id="featured-track">
+          <div id="featured-track-card">
+
+            <div class="track-card">
+              <img src="https://d1ptp6rux3p5im.cloudfront.net/loop_artworks/1721832807511-27fdb9255bcc5b21ee27NaN.png">
+              <div class="play-button">
+                <div class="play-triangle">
+                </div>
+              </div>
+            </div>
+            <div>
+            </div>
+
+            <div id="featured-description">
+              <div id="featured-row-1">
+                <div id="name-and-artist">
+                  <h2>
+                    SEX
+                  </h2>
+                  <h3>
+                    Wonderlust
+                  </h3>
+                </div>
+              </div>
+              <hr>
+              <div id="featured-row-2">
+                <p id="featured-tags">
+                  <button>Pop Rap</button>
+                  <button>The Weekend</button>
+                  <button>Live Instruments</button>
+                  <button>Supertrap</button>
+                </p>
+                <p>
+                  Loop/beatmaker out of Ohio. Focus on Trap beats and guitar loops. HMU on instagram or beatstars.
+                </p>
+              </div>
+              <div id="featured-row-2">
+                <button>
+                  <svg class="featured-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                      d="m17.217 11.996l-3.308 1.079v3.478l-2.052-2.818l-3.309 1.079l2.043-2.818l-2.043-2.819l3.31 1.08l2.05-2.819v3.487zm0 0v7.277H6.854V4.584h10.363zl4.585-1.49v-7.67L19.135 0H2.198v24h16.92l2.684-2.685v-7.83z" />
+                  </svg>
+                </button>
+                <button>
+                  <svg class="featured-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 24 24">
+                    <path fill="currentColor" fill-rule="evenodd"
+                      d="M7.465 1.066C8.638 1.012 9.012 1 12 1c2.988 0 3.362.013 4.534.066c1.172.053 1.972.24 2.672.511c.733.277 1.398.71 1.948 1.27c.56.549.992 1.213 1.268 1.947c.272.7.458 1.5.512 2.67C22.988 8.639 23 9.013 23 12c0 2.988-.013 3.362-.066 4.535c-.053 1.17-.24 1.97-.512 2.67a5.396 5.396 0 0 1-1.268 1.949c-.55.56-1.215.992-1.948 1.268c-.7.272-1.5.458-2.67.512c-1.174.054-1.548.066-4.536.066c-2.988 0-3.362-.013-4.535-.066c-1.17-.053-1.97-.24-2.67-.512a5.397 5.397 0 0 1-1.949-1.268a5.392 5.392 0 0 1-1.269-1.948c-.271-.7-.457-1.5-.511-2.67C1.012 15.361 1 14.987 1 12c0-2.988.013-3.362.066-4.534c.053-1.172.24-1.972.511-2.672a5.396 5.396 0 0 1 1.27-1.948a5.392 5.392 0 0 1 1.947-1.269c.7-.271 1.5-.457 2.67-.511m8.98 1.98c-1.16-.053-1.508-.064-4.445-.064c-2.937 0-3.285.011-4.445.064c-1.073.049-1.655.228-2.043.379c-.513.2-.88.437-1.265.822a3.412 3.412 0 0 0-.822 1.265c-.151.388-.33.97-.379 2.043c-.053 1.16-.064 1.508-.064 4.445c0 2.937.011 3.285.064 4.445c.049 1.073.228 1.655.379 2.043c.176.477.457.91.822 1.265c.355.365.788.646 1.265.822c.388.151.97.33 2.043.379c1.16.053 1.507.064 4.445.064c2.938 0 3.285-.011 4.445-.064c1.073-.049 1.655-.228 2.043-.379c.513-.2.88-.437 1.265-.822c.365-.355.646-.788.822-1.265c.151-.388.33-.97.379-2.043c.053-1.16.064-1.508.064-4.445c0-2.937-.011-3.285-.064-4.445c-.049-1.073-.228-1.655-.379-2.043c-.2-.513-.437-.88-.822-1.265a3.413 3.413 0 0 0-1.265-.822c-.388-.151-.97-.33-2.043-.379m-5.85 12.345a3.669 3.669 0 0 0 4-5.986a3.67 3.67 0 1 0-4 5.986M8.002 8.002a5.654 5.654 0 1 1 7.996 7.996a5.654 5.654 0 0 1-7.996-7.996m10.906-.814a1.337 1.337 0 1 0-1.89-1.89a1.337 1.337 0 0 0 1.89 1.89"
+                      clip-rule="evenodd" />
+                  </svg>
+
+                </button>
+                <button>
+                  <svg class="featured-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                      d="M23.643 4.937c-.835.37-1.732.62-2.675.733a4.67 4.67 0 0 0 2.048-2.578a9.3 9.3 0 0 1-2.958 1.13a4.66 4.66 0 0 0-7.938 4.25a13.229 13.229 0 0 1-9.602-4.868c-.4.69-.63 1.49-.63 2.342A4.66 4.66 0 0 0 3.96 9.824a4.647 4.647 0 0 1-2.11-.583v.06a4.66 4.66 0 0 0 3.737 4.568a4.692 4.692 0 0 1-2.104.08a4.661 4.661 0 0 0 4.352 3.234a9.348 9.348 0 0 1-5.786 1.995a9.5 9.5 0 0 1-1.112-.065a13.175 13.175 0 0 0 7.14 2.093c8.57 0 13.255-7.098 13.255-13.254c0-.2-.005-.402-.014-.602a9.47 9.47 0 0 0 2.323-2.41z" />
+                  </svg>
+                  <!-- <img class="featured-icon" src="/static/assets/twitter.svg"> -->
+                </button>
+                <button>
+                  <svg class="featured-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 1024 1024">
+                    <path fill="currentColor"
+                      d="M941.3 296.1a112.3 112.3 0 0 0-79.2-79.3C792.2 198 512 198 512 198s-280.2 0-350.1 18.7A112.12 112.12 0 0 0 82.7 296C64 366 64 512 64 512s0 146 18.7 215.9c10.3 38.6 40.7 69 79.2 79.3C231.8 826 512 826 512 826s280.2 0 350.1-18.8c38.6-10.3 68.9-40.7 79.2-79.3C960 658 960 512 960 512s0-146-18.7-215.9M423 646V378l232 133z" />
+                  </svg>
+                </button>
+
+              </div>
+              <button id="view-featured-profile-button">View Profile</button>
+
+            </div>
+          </div>
+        </section>
+
+      </div>
+      <hr>
+      <section>
+        <h2>
+          Hot
+        </h2>
+        <h3>
+          What users have been vibing to
+        </h3>
+        <div class="card-carousel">
+          <div class="track-card-container">
+            <div onClick="expandCard(this)" class="track-card">
+              <img src="https://d1ptp6rux3p5im.cloudfront.net/loop_artworks/1726155859280-50bd0017aa646e1685000.jpg">
+              <div class="play-button">
+                <div class="play-triangle">
+                </div>
+              </div>
+            </div>
+            <div class="track-info">
+              <span>The freak next t...</span>
+              <hr>
+              <span class="username">lovejames</span>
+              <span class="bpm">130 bpm</span>
+            </div>
+
+          </div>
+
+
+
+          <div class="track-card-container">
+            <div class="track-card">
+              <img
+                src="https://cf-simple-s3-origin-cloudfrontfors3-loophead-201993304606.s3.amazonaws.com/1725978573198-ba66f11e1257cab42597.png">
+              <div class="play-button">
+                <div class="play-triangle">
+                </div>
+              </div>
+            </div>
+            <div class="track-info">
+              <span class="username">wonderlust</span>
+              <span class="bpm">70 bpm</span>
+            </div>
+          </div>
+
+          <div class="track-card">
+            <img src="https://i1.sndcdn.com/artworks-27aK5vSVPdbL3pDm-PtbYmg-t200x200.jpg">
+            <div class="play-button">
+              <div class="play-triangle">
+              </div>
+            </div>
+          </div>
+
+          <div class="track-card">
+            <img src="https://i1.sndcdn.com/artworks-kCfn9y1YDVwW4CRP-47bGXw-t200x200.jpg">
+            <div class="play-button">
+              <div class="play-triangle">
+              </div>
+            </div>
+          </div>
+
+
+          <div class="track-card">
+            <img src="https://i1.sndcdn.com/avatars-vQNo2eysBMlvg5o0-pu55bw-t200x200.jpg">
+            <div class="play-button">
+              <div class="play-triangle">
+              </div>
+            </div>
+          </div>
+
+
+          <div class="track-card">
+            <img src="https://i1.sndcdn.com/artworks-Z72gEG01aRSJ6dF2-h2LyGg-t200x200.jpg">
+            <div class="play-button">
+              <div class="play-triangle">
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="track-card">
+            <img src="https://i1.sndcdn.com/avatars-Jux4u9ZbmMjdKMyU-Ml9f2w-t50x50.jpg">
+            <div class="play-button">
+              <div class="play-triangle">
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="track-card">
+            <img src="https://i1.sndcdn.com/artworks-l28qLNlZEjPBTX5L-T8EKFQ-t200x200.jpg">
+            <div class="play-button">
+              <div class="play-triangle">
+              </div>
+            </div>
+          </div>
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+      </section>
+      <hr>
+
+      <section>
+        <h2>
+          Recently Played
+        </h2>
+        <h3>
+          What you've been vibing to
+        </h3>
+        <div class="card-carousel">
+          <div class="track-card">
+            <img src="https://d1ptp6rux3p5im.cloudfront.net/loop_artworks/1726155859280-50bd0017aa646e1685000.jpg">
+            <div class="play-button">
+              <div class="play-triangle">
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr>
+
+      </section>
+
+
+
+      <section>
+        <h2>
+          Dance
+        </h2>
+        <h3>
+
+        </h3>
+        <div class="card-carousel">
+          <div class="track-card">
+            <img src="https://i1.sndcdn.com/artworks-U4IG3GVioeueouH4-bwwrVw-t200x200.jpg">
+            <div class="play-button">
+              <div class="play-triangle">
+              </div>
+            </div>
+          </div>
+
+
+          <div class="track-card">
+            <img src="https://i1.sndcdn.com/artworks-l28qLNlZEjPBTX5L-T8EKFQ-t200x200.jpg">
+            <div class="play-button">
+              <div class="play-triangle">
+              </div>
+            </div>
+          </div>
+
+
+
+        </div>
+        <hr>
+
+      </section>
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+
+
+</body>
+
+</html>

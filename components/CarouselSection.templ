@@ -1,0 +1,145 @@
+package components
+
+import "github.com/jmarren/deepfried/services"
+
+templ CarouselSectionBody(carousel []*services.PlayableElt) {
+	<div class="card-carousel" data-click-index="0" hx-on:htmx-after-settle="triggerCardAnimations(this)">
+		<div class="cards-container" data-current-transform="0">
+			for _, card := range carousel {
+				@CarouselCardBody(card)
+			}
+		</div>
+		<button class="carousel-chevron-forward" hx-on:click="MoveCarouselRight(this)">
+			@ChevronRightIcon()
+		</button>
+	</div>
+}
+
+var carouselHeadOnceHandle = templ.NewOnceHandle()
+
+templ CarouselSectionHead() {
+	@carouselHeadOnceHandle.Once() {
+		<script id="carousel-script">
+	function MoveCarouselRight(elt) {
+		const carouselElt = htmx.closest(elt, ".card-carousel")
+		const carouselWidth = carouselElt.getBoundingClientRect().width 
+		const cardsContainerElts = Array.from(htmx.findAll(carouselElt, ".cards-container"))
+		let cardsContainerElt
+		if (cardsContainerElts.length > 1) {
+			cardsContainerElts[0].remove()
+			cardsContainerElt = cardsContainerElts[1]
+		} else {
+			cardsContainerElt = cardsContainerElts[0]
+		}
+		const cardElt = htmx.find(cardsContainerElt, ".track-card-container")
+		const cardWidth = cardElt.getBoundingClientRect().width
+		const cardsArr = Array.from(htmx.findAll(cardsContainerElt, ".track-card-container"))
+		const cardsContainerWidth = cardsContainerElt.getBoundingClientRect().width
+		const slideDist = -1 * carouselWidth
+		let currentTransform = parseInt(cardsContainerElt.dataset.currentTransform)
+		const totalWidth = cardsArr.length * cardWidth
+		const paddedWidth = totalWidth - carouselWidth
+
+		if (Math.abs(currentTransform) > paddedWidth) { 
+			const newCards = cardsContainerElt.cloneNode(true)
+			cardsContainerElt.style.position = 'absolute';
+			newCards.dataset.currentTransform = 0
+			carouselElt.appendChild(newCards)
+			htmx.process(newCards)
+			
+			const frames = [
+				{ transform: `translateX(${carouselWidth}px)`},
+				{ transform: `translateX(${0}px)`}
+			];
+			const animation = new KeyframeEffect(
+				newCards,
+				frames, 
+				{ duration: 500, fill: 'forwards', easing: 'cubic-bezier(0.15, 0.83, 0.66, 1)'}
+				)
+			const player = new Animation(animation, document.timeline)
+			player.play()
+		} 
+
+		const frames = [
+			{ transform: `translateX(${currentTransform}px)`},
+			{ transform: `translateX(${currentTransform + slideDist + cardWidth}px)`}
+		];
+		const animation = new KeyframeEffect(
+			cardsContainerElt,
+			frames, 
+			{ duration: 500, fill: 'forwards', easing: 'cubic-bezier(0.15, 0.83, 0.66, 1)'}
+			)
+		const player = new Animation(animation, document.timeline)
+		player.play()
+		cardsContainerElt.dataset.currentTransform = currentTransform + slideDist
+	}
+
+	</script>
+		<style id="carouselStyles">
+  .card-carousel {
+    min-width: 500px;
+    flex-grow: 1;
+    padding: 10px 10px 15px 10px;
+    overflow-x: hidden;
+    position: relative;
+    margin-bottom: 10px;
+    margin-top: 5px;
+/*    background-color: #1d1d1e;*/
+/*   background-color: var(--dark-gray); */
+/*    background-color: #282727; */
+     border-radius: 10px 0 0 10px;
+/*     background-color: #1b1f20; */
+/*    background-color: var(--dark-gray); */
+  }
+
+   .cards-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    position: inline-block;
+   }
+
+
+   @keyframes slide-left {
+	0% {
+		transform: 0;
+	}
+	100% {
+		transform: translateX(calc(-100vw + 100px));
+	}
+   }
+
+
+  .card-carousel .track-image {
+    width: var(--medium-image-size);
+    height: var(--medium-image-size);
+    min-width: var(--medium-image-size);
+    min-height: var(--medium-image-size);
+    border-radius: 10px;
+  }
+
+  .carousel-chevron-forward {
+	width: 20px;
+	height: 20px;
+	border-radius: 100%;
+	position: absolute;
+	right: 10px;
+	top: calc(50% - 10px);
+	background-color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 3;
+	border: 1px solid var(--border-color-1);
+  }
+
+  .carousel-chevron-forward:hover {
+	background-color: var(--border-color-1);
+  }
+  .card-carousel .track-image>img {
+    border-radius: 5px;
+  }
+</style>
+	}
+}

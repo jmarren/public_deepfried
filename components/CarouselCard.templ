@@ -1,0 +1,72 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/services"
+)
+
+func whiteCardClass(isPlaying bool) string {
+	if isPlaying {
+		return "white-track-card"
+	}
+	return ""
+}
+
+templ CarouselCardBody(card *services.PlayableElt) {
+	<div class="outline-container">
+		<div class="track-card-outline katana-card"></div>
+		<div class={ fmt.Sprintf("track-card-container katana-card fade-in-slowly %s", whiteCardClass(card.IsPlaying)) }>
+			<div class="card-initial">
+				<button
+					class="playable"
+					id={ card.EltId }
+					preload="mousedown"
+					preload-images="true"
+					hx-audio={ card.ID.String() }
+					hx-audio-toggle-fx="class white-track-card"
+					hx-audio-toggle-target="closest .track-card-container"
+				>
+					<img class="artwork  " src={ card.ArtworkSrc } width="100" height="100"/>
+				</button>
+				<div class="track-info">
+					<img class="profile-photo-small profile-photo" src={ card.ProfilePhotoSrc }/>
+					<span class="track-info-right">
+						<span
+							class="card-title clickable-text"
+							hx-trigger="click"
+							hx-get={ fmt.Sprintf("%s/%s", card.Username, card.Title) }
+							hx-target="#page-content"
+							hx-push-url="true"
+						>{ card.Title }</span>
+						<span
+							class="card-username clickable-text"
+							hx-get={ fmt.Sprintf("/%s", card.Username) }
+							hx-target="#page-content"
+							hx-push-url="true"
+						>
+							{ card.Username }
+						</span>
+						<span class="card-bpm">
+							{ fmt.Sprintf("%d", card.Bpm) } bpm
+						</span>
+						<span class="spacer"></span>
+					</span>
+				</div>
+				<!--
+			if card.IsPlaying {
+				<div id="playing-indicator">
+					<div id="playing-indicator-content">
+						<div class="triangle-forward-container">
+							<div class="triangle control triangle-forward"></div>
+						</div>
+					</div>
+				</div>
+			}
+			 -->
+			</div>
+			<div id="extra-info"></div>
+		</div>
+	</div>
+}
+
+var carouselCardStylesHandle = templ.NewOnceHandle()

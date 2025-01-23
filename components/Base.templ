@@ -1,0 +1,81 @@
+package components
+
+import (
+	"github.com/jmarren/deepfried/services"
+	"github.com/jmarren/deepfried/util"
+	"html/template"
+)
+
+templ Base(profilePhotoSrc string, notifications []*services.FollowNotification, page templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		@Head()
+		<body hx-ext="head-support,preload,debug,audio,history-preserve,upload,morph" hx-headers="{}" hx-sync="this:queue all" hx-on:click="RemoveModal(event)">
+			<audio id="currently-playing"></audio>
+			<div id="player"></div>
+			<main hx-history-elt>
+				<div
+					id="modal"
+					tabindex="0"
+					hx-on:click="event.stopPropagation()"
+					style="display:none"
+				>
+					{ children... }
+				</div>
+				<span id="logo" hx-trigger="click" hx-target="#page-content" hx-get="/" hx-push-url="true">
+					deepfried.<!--<span id="logo-fm">fm</span>-->
+				</span>
+				@TopBar(profilePhotoSrc, notifications)
+				<div id="page">
+					@SideBar()
+					<div id="page-content" class="loaded">
+						@page
+					</div>
+				</div>
+			</main>
+		</body>
+	</html>
+}
+
+var goTemplate = template.Must(template.New("fontfacestyle").Parse("<style hx-preserve='true' id='font-face-styles'> @font-face {font-family: 'Aileron';font-style: 'Black';src: url('{{ . }}') format('opentype');}</style>"))
+
+templ Head() {
+	<head>
+		<title hx-preserve="true"></title>
+		<meta hx-preserve="true" charset="UTF-8"/>
+		<meta hx-preserve="true" name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta hx-preserve="true" http-equiv="X-UA-Compatible" content="ie=edge"/>
+		<link hx-preserve="true" rel="preconnect" href="https://fonts.googleapis.com"/>
+		<link hx-preserve="true" rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+		<link
+			hx-preserve="true"
+			href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			rel="preconnect"
+			hx-preserve="true"
+			href="https://fonts.googleapis.com"
+		/>
+		<link
+			rel="preconnect"
+			hx-preserve="true"
+			href="https://fonts.gstatic.com"
+			hx-preserve="true"
+			crossorigin
+		/>
+		<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Slabo+27px&display=swap" rel="stylesheet"/>
+		<link hx-preserve="true" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"/>
+		<script hx-preserve="true" src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr" crossorigin="anonymous"></script>
+		<script hx-preserve="true" src="https://unpkg.com/htmx-ext-head-support@2.0.1/head-support.js"></script>
+		<script hx-preserve="true" src="https://unpkg.com/htmx-ext-preload@2.0.1/preload.js"></script>
+		<script hx-preserve="true" src="https://unpkg.com/idiomorph@0.4.0"></script>
+		<!-- 		<script hx-preserve="true" src="https://unpkg.com/hyperscript.org@0.9.13"></script> -->
+		<link hx-preserve="true" href={ util.GetStaticSrc("css/global.css") } rel="stylesheet" type="text/css"/>
+		<script hx-preserve="true" src={ util.GetStaticSrc("js/index.js") }></script>
+		<script hx-preserve="true" src={ util.GetStaticSrc("js/hx_history_preserve.js") }></script>
+		<script hx-preserve="true" src={ util.GetStaticSrc("js/carousel.js") }></script>
+		<script hx-preserve="true" src={ util.GetStaticSrc("js/hx_upload.js") }></script>
+		@templ.FromGoHTML(goTemplate, util.GetStaticSrc("fonts/aileron.black.otf"))
+	</head>
+}

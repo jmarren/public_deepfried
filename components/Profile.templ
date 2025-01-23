@@ -1,0 +1,95 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/services"
+	"github.com/jmarren/deepfried/util"
+)
+
+func getFollowingersURL(isMine bool, username string, relation string) string {
+	if isMine {
+		username = "me"
+	}
+	return fmt.Sprintf("/modal/users/%s/%s", username, relation)
+}
+
+templ Profile(auth bool, data *services.UserProfile, pinsSection templ.Component, mostPopular templ.Component, playing string) {
+	<head hx-head="merge">
+		<link href={ util.GetStaticSrc("css/profile.css") } rel="stylesheet" type="text/css"/>
+		<link href={ util.GetStaticSrc("css/carousel.css") } rel="stylesheet" type="text/css"/>
+		<link href={ util.GetStaticSrc("css/track_card.css") } rel="stylesheet" type="text/css"/>
+		<link href={ util.GetStaticSrc("css/pins.css") } rel="stylesheet" type="text/css"/>
+	</head>
+	<div id="my-profile" class="page-fade-in">
+		<section id="profile-header" class="normal-section">
+			<img
+				width="300"
+				height="300"
+				class="profile-header-photo"
+				src={ data.ProfilePhotoSrc }
+			/>
+			<div id="profile-header-info">
+				<div id="profile-header-info-top">
+					<h1>{ data.Username }</h1>
+					<div id="links">
+						@Twitter(templ.SafeURL("https://www.twitter.com"))
+						@Instagram(templ.SafeURL("https://www.instagram.com"))
+					</div>
+				</div>
+				<div id="profile-header-info-sub">
+					<div id="followingers">
+						<h2
+							hx-get={ getFollowingersURL(data.IsMine, data.Username, "followers") }
+							hx-target="#modal"
+							hx-swap="innerHTML"
+						>Followers { fmt.Sprintf("%d", data.Followers) }</h2>
+						<div style="width:10px;"></div>
+						<h2
+							hx-get={ getFollowingersURL(data.IsMine, data.Username, "following") }
+							hx-target="#modal"
+							hx-swap="innerHTML"
+						>Following { fmt.Sprintf("%d", data.Following) }</h2>
+					</div>
+					<h2 id="profile-user-bio">
+						{ data.Bio.String }
+					</h2>
+				</div>
+				if !auth {
+					<div></div>
+				} else if data.IsMine {
+					<div id="edit-buttons-container">
+						<button id="edit-icon" hx-get="/modal/edit-profile" preload="mouseover" hx-target="#modal" hx-swap="innerHTML">
+							@EditIcon()
+						</button>
+						<!--
+						<button id="edit-pins-button" hx-get="/modal/edit-pins" hx-swap="outerHTML" hx-target="#modal">Edit Pins </button>
+					-->
+					</div>
+				} else if data.IAmFollowing {
+					@FollowButton(true, data.Username)
+				} else {
+					@FollowButton(false, data.Username)
+				}
+			</div>
+		</section>
+		<div id="profile-content">
+			@pinsSection
+			<section class="carousel-section">
+				<h2 class="section-title">uploads</h2>
+				@mostPopular
+			</section>
+			<!--
+			@StandardSection("Pins", Pins(data.Pins, isMine, playing))
+			for _, sectionData := range data.CarouselSectionsData {
+				@StandardSection(sectionData.Title, Carousel(sectionData.Cards))
+			}
+		-->
+		</div>
+	</div>
+}
+
+templ EditPinsButton() {
+	<button class="standard-section-title" id="edit-pins-button">
+		Edit Pins
+	</button>
+}

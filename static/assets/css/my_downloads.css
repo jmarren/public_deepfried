@@ -1,0 +1,84 @@
+#my-downloads {
+  color: white;
+  padding: 20px;
+  flex-grow: 1;
+}
+
+#downloads-card-grid {
+  padding: 20px;
+}
+
+.outline-container {
+  display: inline-block;
+  margin: 5px;
+}
+
+#my-downloads-title {
+  font-size: 30px;
+  border-bottom:1px solid white;
+}
+
+
+.downloads-grid-item {
+  max-width: calc(var(--medium-image-size) + 20px);
+  font-family: Inter;
+  font-size: 10px;
+  margin: 20px 10px 20px 0px;
+  display: inline-block;
+  /* margin: 20px 10px; */
+  padding: 10px;
+} 
+
+#my-downloads .searchbar-input{
+  font-size: 0.8em;
+  height: 20px;
+}
+
+#my-downloads .icon-container {
+  width: fit-content;
+  border-left: 1px solid white;
+}
+
+#my-downloads .searchbar {
+  padding-left: 2px
+
+}
+
+#my-downloads .searchbar-container {
+  margin-top: 8px;
+}
+
+#my-downloads .searchbar-container button {
+  scale: 0.6
+}
+
+#my-downloads .searchbar-input {
+  /* height: 20px; */
+  /* background-color: #575656; */
+  /* background-color: white;  */
+  /* color:black; */
+}
+
+/* #my-downloads .track-image { */
+/*   width: var(--medium-image-size); */
+/*   height: var(--medium-image-size); */
+/*   min-width: var(--medium-image-size); */
+/*   min-height: var(--medium-image-size); */
+/* }  */
+/**/
+
+/* #my-downloads .track-image>img { */
+/*   border-radius: 5px; */
+/* } */
+
+/* #my-downloads .card-title { */
+/*   padding: 4px 0; */
+/* } */
+
+
+#my-downloads-header {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: space-between; */
+  gap: 10px;
+}

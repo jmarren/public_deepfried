@@ -1,0 +1,469 @@
+package components
+
+import "github.com/jmarren/deepfried/util"
+
+templ FiltersModal() {
+	<head hx-head="append">
+		<link href={ util.GetStaticSrc("css/filters.css") } rel="stylesheet" type="text/css"/>
+		<script hx-preserve="true" src={ util.GetStaticSrc("js/filters.js") }></script>
+	</head>
+	<div id="filters-form" class="component-fade-in" hx-on:click="event.stopPropagation()">
+		<div id="filters-form-title">
+			Filters
+		</div>
+		<div id="filters-form-body">
+			<div id="bpm-section">
+				<div class="filter-section-title">Bpm</div>
+				<div class="filters-form-section-content">
+					<div class="checkbox-container">
+						<input type="checkbox" name="bpm-radio" hx-on:change="toggleBpmType(this)" value="use-exact"/>
+						<label for="bpm-radio">use exact bpm</label>
+					</div>
+					<div class="input-container bpm-exact">
+						<input type="number" name="exact-bpm" class="input-field" hx-on:change="" disabled/>
+					</div>
+					<div class="checkbox-container">
+						<input type="checkbox" name="bpm-radio" hx-on:change="toggleBpmType(this)" value="use-range"/>
+						<label for="bpm-radio">use range</label>
+					</div>
+					<div id="bpm-min-max-inputs-container" class="input-container bpm-range">
+						<div>
+							<label for="min-bpm">min bpm</label>
+							<input type="number" name="min-bpm" class="" value="0" disabled/>
+						</div>
+						<div>
+							<label for="max-bpm">max bpm</label>
+							<input type="number" name="max-bpm" class="" value="200" disabled/>
+						</div>
+					</div>
+					<div id="bpm-slider-bar-container" class="bpm-range">
+						<div
+							class="bpm-range"
+							id="display-slider"
+							_="
+							on valueChanged(low, high) 
+								log low
+								log high
+							"
+						>
+							<div
+								id="low-slider"
+								hx-on:pointerdown="grabSlider(this, event)"
+							></div>
+							<div
+								id="high-slider"
+								hx-on:pointerdown="grabSlider(this, event)"
+							></div>
+						</div>
+						<!--
+						<div
+							id="display-slider"
+							_="
+							on valueChanged(low, high) 
+								log low
+								log high
+							"
+						>
+							<div
+								id="low-slider"
+								_="
+							on pointerdown 
+							send event to 
+							#range-low
+							"
+							></div>
+							<div id="high-slider"></div>
+						</div>
+						<div class="slider-track">
+							<input
+								id="range-low"
+								type="range"
+								min="0"
+								max="200"
+								value="0"
+								_="
+								on input 
+									set :higherVal to 
+									#range-high.value as an Int
+
+									set :myVal to 
+									me.value as an Int
+
+									if :myVal <= :higherVal
+										event.preventDefault()
+										log event
+										set me.value to :myVal - 1
+									end
+							"
+							/>
+							<input
+								id="range-high"
+								type="range"
+								min="0"
+								max="200"
+								value="100"
+								_="
+								on input 
+									set :lowerVal to 
+									#range-low.value as an Int
+
+									set :myVal to 
+									me.value as an Int
+
+									if :myVal >= :lowerVal 
+										send valueChanged(low: :lowerVal, high: :myVal) to #display-slider
+									end
+							"
+							/>
+						</div>
+						-->
+						<!--
+						<div id="bpm-slider-bar">
+							<input type="range" orient="horizontal" id="bpm-slider-one" min="0" max="100" step="1"/>
+						</div>
+						<div id="bpm-slider-bar">
+							<div
+								id="bpm-slider-one"
+								hx-on:pointerdown="grabBpmSlider(this, event)"
+							></div>
+							<div
+								id="bpm-slider-two"
+								hx-on:pointerdown="grabBpmSlider(this, event)"
+							></div>
+						</div>
+						-->
+					</div>
+				</div>
+			</div>
+			<div id="musical-key-section">
+				<div class="filter-section-title">Key</div>
+				<div class="filters-form-section-content">
+					<div class="input-container">
+						<label for="musical-key">key</label>
+						<select
+							class="input-field"
+							name="musical-key"
+						>
+							<option value="any">any</option>
+							<option value="C">C</option>
+							<option value="D">D</option>
+							<option value="E">E</option>
+							<option value="F">F</option>
+							<option value="G">G</option>
+							<option value="A">A</option>
+							<option value="B">B</option>
+						</select>
+					</div>
+					<div class="input-container">
+						<label for="musical-key-signature">key signature</label>
+						<select
+							class="input-field"
+							name="musical-key-signature"
+						>
+							<option value="any"></option>
+							<option value="natural">natural</option>
+							<option value="sharp">#</option>
+							<option value="flat">&#9837;</option>
+						</select>
+					</div>
+					<div class="input-container">
+						<label for="major-minor">major/minor</label>
+						<select
+							class="input-field"
+							name="major-minor"
+						>
+							<option value="any"></option>
+							<option value="Major">Major</option>
+							<option value="Minor">Minor</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div id="file-type-section">
+				<div class="filter-section-title">File</div>
+				<div class="filters-form-section-content">
+					<input type="checkbox" name="includes-stems-only" unchecked/>
+					<label for="includes-stems-only">includes stems only</label>
+				</div>
+			</div>
+		</div>
+		<div id="filter-section-bottom-buttons">
+			<button id="cancel-filters-button" hx-on:click="htmx.find('#modal').innerHTML = ''">Cancel</button>
+			<button id="apply-filters-button" hx-get="/search?page=1" hx-target="#page-content" hx-push-url="true" hx-on:htmx:after-request="htmx.find('#modal').click()" hx-include="#filters-form, input[name=keyword]">Apply</button>
+		</div>
+	</div>
+}
+
+var filtersHeadOnceHandle = templ.NewOnceHandle()
+
+templ FiltersModalHead() {
+	@filtersHeadOnceHandle.Once() {
+		<script id="filters-modal-script">
+
+		function toggleBpmType(elt) {
+			const useExactCbx = htmx.find("input[value=use-exact]")
+			const useRangeCbx = htmx.find("input[value=use-range]")
+			const exactInput = htmx.find("input[name=exact-bpm]")
+			const minBpmInput = htmx.find("input[name=min-bpm]")
+			const maxBpmInput = htmx.find("input[name=max-bpm]")
+			const minBpmLabel = htmx.find("label[for=min-bpm]")
+			const maxBpmLabel = htmx.find("label[for=max-bpm]")
+			if (useExactCbx.checked == true) {
+				minBpmInput.disabled = true;
+				maxBpmInput.disabled = true;
+				minBpmLabel.style.color = ''
+				maxBpmLabel.style.color = ''
+				exactInput.disabled = false;
+				useRangeCbx.checked = false;
+			} else if (useRangeCbx.checked == true) {
+				minBpmInput.disabled = false;
+				maxBpmInput.disabled = false;
+				minBpmLabel.style.color = 'var(--dark-gray)'
+				maxBpmLabel.style.color = 'var(--dark-gray)'
+				exactInput.disabled = true;
+			}
+
+			if (!useRangeCbx.checked) {
+				minBpmInput.disabled = true;
+				maxBpmInput.disabled = true;
+				minBpmLabel.style.color = ''
+				maxBpmLabel.style.color = ''
+			} 
+			if (!useExactCbx.checked) {
+				exactInput.disabled = true;
+			}
+		}
+
+		function grabBpmSlider(elt, e) {
+			const useRangeCbx = htmx.find("input[value=use-range]")
+			if (!useRangeCbx.checked) return
+			htmx.find("input[name=exact-bpm]").disabled = true;
+			const MAX_ALLOWED_BPM = 200;
+			const SLIDER_WIDTH = htmx.find("#bpm-slider-bar").getBoundingClientRect().width;
+			const COEFFICIENT =  MAX_ALLOWED_BPM / SLIDER_WIDTH;
+
+			let otherSlider;
+			if (elt.id == "bpm-slider-one") {
+				otherSlider = htmx.find("#bpm-slider-two")
+			} else {
+				otherSlider = htmx.find("#bpm-slider-one")
+			}
+
+			
+			let otherSliderLeft  = parseInt(otherSlider.style.left.trimEnd().trimEnd());
+			if (!otherSliderLeft) {
+				otherSliderLeft = 0;
+			}
+
+
+			let grabbed = true
+			elt.setPointerCapture(e.pointerId)
+			const parent = elt.parentNode
+			let newProgress
+			elt.onpointermove = (evt) => {
+				let relativeX = evt.clientX - parent.offsetLeft
+				relativeX = Math.max(0, relativeX)
+				relativeX = Math.min(parent.offsetWidth, relativeX)
+				newProgress = relativeX / parent.offsetWidth
+				elt.style.left = `${relativeX - 5}px`
+				
+				
+				
+				console.log("relativeX: ", relativeX, "\notherSliderLeft: ", otherSliderLeft);
+
+				if (otherSliderLeft > relativeX) {
+					document.documentElement.style.setProperty('--bpm-slider-min',`${relativeX - 5}px`)
+					document.documentElement.style.setProperty('--bpm-slider-max',`${otherSliderLeft}px`)
+					htmx.find("input[name=min-bpm]").value = relativeX  * COEFFICIENT
+					htmx.find("input[name=max-bpm]").value = otherSliderLeft * COEFFICIENT
+				} else {
+					document.documentElement.style.setProperty('--bpm-slider-max',`${relativeX - 5}px`)
+					document.documentElement.style.setProperty('--bpm-slider-min',`${otherSliderLeft}px`)
+					htmx.find("input[name=min-bpm]").value = otherSliderLeft * COEFFICIENT
+					htmx.find("input[name=max-bpm]").value = relativeX * COEFFICIENT
+				}
+			}
+			window.onpointerup = () => {
+				elt.releasePointerCapture(e.pointerId)
+				elt.onpointermove = null
+				grabbed = false
+				window.onpointerup = null;
+			}
+
+		}
+		
+
+	</script>
+		<style id="filters-styles">
+      #filters-form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 15px;
+	padding: 30px 40px 20px 40px;
+	 background-color: #ffffff;
+	 box-shadow: 0px 106px 42px rgba(0, 0, 0, 0.01),
+		 0px 59px 36px rgba(0, 0, 0, 0.05), 0px 26px 26px rgba(0, 0, 0, 0.09),
+		 0px 7px 15px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
+	 border-radius: 11px;
+	 font-family: "Inter", sans-serif;
+	font-weight: 600;
+	font-size: 0.8em;
+      }
+
+      #filters-form-title {
+	font-size: 1.5em;
+	align-self: start;
+      }
+
+#filters-form-body {
+   display: flex;
+   flex-direction: row;
+   gap: 20px;
+}
+
+.filter-section-title {
+   color: var(--dark-gray);
+   font-size: 1.1em;
+   border-bottom: 1px solid var(--dark-gray);
+}
+
+.filters-form-section-content {
+	padding: 10px;
+}
+
+.checkbox-container {
+  display: flex;
+  padding-bottom: 0px;
+  align-items: center;
+} 
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 10px;
+  position: relative;
+}
+
+#bpm-min-max-inputs-container {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+	max-width: 200px;
+}
+
+.bpm-option-container { 
+	display: flex;
+}
+
+#bpm-min-max-inputs-container input {
+	max-width: 80px;
+}
+
+#bpm-min-max-inputs-container>div {
+	max-width: 100px;
+}
+#bpm-slider-bar-container {
+      height: 15px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+}
+
+#bpm-slider-bar {
+      height: 100%;
+      width: 100%;
+      border: 1px solid var(--light-gray-1);
+      border-radius: 2.5px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(to right,
+		#ebebeb,
+	    #ebebeb var(--bpm-slider-min),
+	    var(--dark-gray) var(--bpm-slider-min),
+    	    var(--dark-gray) var(--bpm-slider-max),
+    	    #ebebeb var(--bpm-slider-max),
+	    #ebebeb
+    	  );
+    }
+
+#bpm-slider-one,
+#bpm-slider-two {
+        border: 1px solid var(--light-gray-1);
+	left: 0px;
+	position: absolute;
+	width: 10px; 
+	height: 110%;
+	background-color: lightgray;
+}
+
+
+#bpm-slider-one {
+	left: var(--bpm-slider-min);
+}
+
+#bpm-slider-two {
+	left: var(--bpm-slider-max);
+}
+
+#bpm-section  {
+  color: #ebebeb;
+}
+
+#bpm-section label[for=bpm-radio] {
+  color: var(--dark-gray);
+}
+
+#filter-section-bottom-buttons {
+	height: 40px;
+	display: flex;
+	gap: 10px;
+	width: 100%;
+	margin-top: 40px;
+}
+
+#filter-section-bottom-buttons button {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items:center;
+	flex-grow:1;
+	border-radius: 10px;
+    transition: background-color 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+}
+
+#filter-section-bottom-buttons #cancel-filters-button {
+}
+
+
+#filter-section-bottom-buttons #apply-filters-button {
+	background-color: var(--dark-gray);
+	color: white;
+	border: 2px solid var(--dark-gray);
+}
+
+
+  #filter-section-bottom-buttons #apply-filters-button:hover {
+	background-color: darkgray;
+	color: var(--dark-gray);
+  }
+
+  #filter-section-bottom-buttons  #cancel-filters-button {
+	background-color: white;
+	border: 2px solid var(--dark-gray);
+	color: black;
+  }
+
+
+  #filter-section-bottom-buttons  #cancel-filters-button:hover {
+	background-color: lightgray;
+	border: 2px solid var(--dark-gray);
+	color: black;
+}
+
+
+
+    </style>
+	}
+}

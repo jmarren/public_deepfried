@@ -1,0 +1,26 @@
+package components
+
+import "fmt"
+
+templ TagBarBody(tags []string, keywordTag string) {
+	<div id="tag-container" class="normal-section">
+		if keywordTag != "" {
+			<div class="tagbar-button-container">
+				<div class="tagbar-button-outline">
+					<div class="tagbar-button-behind"></div>
+					<button hx-get={ fmt.Sprintf("/search?page=1&keyword=%s", keywordTag) } id="keyword-tag" hx-target="#page-content" hx-push-url="true">{  keywordTag }</button>
+				</div>
+			</div>
+		}
+		if len(tags) != 0 {
+			for _, tag := range tags {
+				<div class="tagbar-button-container">
+					<div class="tagbar-button-outline">
+						<div class="tagbar-button-behind"></div>
+						<button hx-get={ fmt.Sprintf("/search?page=1&keyword=%s", tag) } hx-target="#page-content" hx-push-url="true">{ tag }</button>
+					</div>
+				</div>
+			}
+		}
+	</div>
+}

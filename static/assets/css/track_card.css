@@ -1,0 +1,121 @@
+
+.outline-container {
+  flex-grow: 1;
+  position:relative;
+  max-width: 122px;
+  margin-bottom: 4px;
+}
+  .track-card-container {
+    font-family: Inter;
+    font-size: 10px;
+    padding: 10px;
+    min-height: 182px;
+    background-color: black;
+    height: 100%;
+  }
+
+
+ .track-card-outline {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background-color: white;
+ }
+
+
+  .profile-photo-small {
+      margin-top: 1px;
+      max-width: 15px;
+      max-height: 15px;
+      display: flex;
+      align-self: start;
+      object-fit: cover;
+  }
+
+  .track-card-container:hover {
+	transform: translateX(-4px) translateY(-4px);
+        transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  }
+  
+.track-info {
+    gap: 4px;
+    display: flex;
+    padding-top: 4px;
+    max-width: 100px;
+    color: white;
+  }
+
+
+  .track-info .track-info-right {
+        color: #878686;
+	display: flex;
+	flex-direction: column;
+  }
+  .track-info .track-info-right .card-title {
+	color: white;
+	font-weight: 500;
+	font-size: 12px;
+	text-wrap: stable;
+  }
+
+
+  .track-info .track-card-container .bpm {
+    color: #8a918a;
+  }
+
+  .track-info .bottom-text svg:hover {
+    color: white;
+  }
+
+  .track-info .user-info {
+	cursor: pointer;
+	display: flex;
+	gap: 4px;
+  }
+  .track-card-container hr {
+    color: var(--border-color-one);
+    background-color: var(--border-color-one);
+    border: none;
+    height: 1.1px;
+    width: 90%;
+  }
+
+  .track-info .bottom-text {
+    display: flex;
+    align-items: end;
+  }
+
+  .track-info .bottom-text .bottom-left-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .spacer {
+    flex-grow: 1;
+  }
+
+  .card-initial {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bottom-text {
+	padding: 4px;
+  }
+
+  .bottom-left-text {
+    color: #878686;
+    font-weight: 500;
+}
+ 
+
+ .white-track-card {
+    color: black;
+    scale: 1.05;
+    background-color: white;
+ }
+
+ .white-track-card .track-info .track-info-right .card-title {
+    color: black;
+ }
+

@@ -1,0 +1,552 @@
+package components
+
+import (
+	"fmt"
+	"github.com/jmarren/deepfried/services"
+	"github.com/jmarren/deepfried/util"
+)
+
+templ Player(data *services.PlayerData) {
+	<head hx-head="append">
+		<script hx-preserve="true" src={ util.GetStaticSrc("js/player.js") }></script>
+		<link hx-preserve="true" href={ util.GetStaticSrc("css/player.css") } rel="stylesheet" type="text/css"/>
+	</head>
+	<audio id="currently-playing" hx-swap-oob="true" src={ data.Current.AudioSrc } data-audio-id={ services.UuidString(data.Current.ID) } hx-on:ended="htmx.find('#skip-forward').click()" rel="prefetch"></audio>
+	<div id="player" style="display:none" hx-history-preserve>
+		<div id="playback-time-bar-container" hx-on:mousemove="HandleMousemoveTime(this, event)" hx-on:mouseenter="HandleMouseoverTime(this, event)" hx-on:click="HandleTimeClick(this,event)" hx-on:mouseleave="HandleMouseLeaveTime(this, event);document.getElementById('time-tooltip').remove()"></div>
+		<div id="playback-time-bar">
+			<div id="playback-progress-marker" hx-on:pointerdown="grabPlayback(event, this)"></div>
+		</div>
+		<div id="player-inside">
+			<img
+				width="100"
+				height="100"
+				src={ data.Current.ArtworkSrc }
+			/>
+			<div id="current-track-info">
+				<div
+					id="title"
+					hx-trigger="click"
+					hx-get={ fmt.Sprintf("/%s/%s", data.Current.Username, data.Current.Title) }
+					hx-target="#page-content"
+					hx-push-url="true"
+				>
+					{ data.Current.Title }
+				</div>
+				<div
+					id="username"
+					hx-trigger="click"
+					hx-get={ fmt.Sprintf("/%s", data.Current.Username) }
+					hx-target="#page-content"
+					hx-push-url="true"
+				>
+					{ data.Current.Username }
+				</div>
+				<div id="bpm"></div>
+				<div id="tags">
+					for _, tag := range data.Current.Tags {
+						<span class="tag">{ tag }</span>
+					}
+				</div>
+			</div>
+			<div class="separator"></div>
+			<div id="player-right-of-image">
+				<div id="player-time">
+					<div id="current-time">
+						<span id="current-minutes">00</span>:<span id="current-seconds">00</span>
+					</div>
+					<div id="duration">
+						<span id="total-minutes">00</span>:<span id="total-seconds">00</span>
+					</div>
+				</div>
+				<div id="player-controls">
+					<button id="skip-backward" hx-audio-backward class="skip-button control-elt">
+						<div class="skip-button-padding-elt"></div>
+						<div class="triangle-back-container">
+							<div class="triangle control triangle-back"></div>
+						</div>
+						<div class="triangle-back-container">
+							<div class="triangle control triangle-back"></div>
+						</div>
+					</button>
+					<button id="toggle-play-button" hx-toggle-audio="true" hx-audio-toggle-fx="innerHTML playtriangle pausebars">
+						<div class="pause-bars">
+							<div class="pause-bar"></div>
+							<div class="pause-bar"></div>
+						</div>
+					</button>
+					<button id="skip-forward" class="skip-button control-elt" hx-audio-forward preload-images="true" preload="mouseover">
+						<div class="triangle-forward-container">
+							<div class="triangle control triangle-forward"></div>
+						</div>
+						<div class="triangle-forward-container">
+							<div class="triangle control triangle-forward"></div>
+						</div>
+						<div class="skip-button-padding-elt"></div>
+					</button>
+				</div>
+			</div>
+			<div></div>
+			<div id="queue-info">
+				<div class="separator"></div>
+				<div id="up-next-div">Up Next </div>
+				for i, item := range data.Queue {
+					if i > 0 {
+						<div class="separator"></div>
+					}
+					<div id="current-track-info">
+						<div
+							id="title"
+							hx-trigger="click"
+							hx-get={ fmt.Sprintf("/%s/%s", item.Username, item.Title) }
+							hx-target="#page-content"
+							hx-push-url="true"
+						>
+							{ item.Title }
+						</div>
+						<div
+							id="username"
+							hx-get={ fmt.Sprintf("/%s", item.Username) }
+							hx-target="#page-content"
+							hx-trigger="click"
+						>
+							{ item.Username }
+						</div>
+						<div id="bpm"></div>
+						<div id="tags">
+							for _, tag := range item.Tags {
+								<span class="tag">{ tag }</span>
+							}
+						</div>
+					</div>
+				}
+				<div class="separator"></div>
+			</div>
+		</div>
+	</div>
+}
+
+templ PlayerHead() {
+	<head>
+		<script id="player-script">
+
+function grabPlayback(evt, elt) {
+	let grabbed = true
+	elt.setPointerCapture(evt.pointerId)
+	const parent = elt.parentNode
+	let newProgress
+	elt.onpointermove = (e) => {
+		let relativeX = e.clientX - parent.offsetLeft
+		relativeX = Math.max(0, relativeX)
+		relativeX = Math.min(parent.offsetWidth, relativeX)
+		newProgress = relativeX / parent.offsetWidth
+		elt.style.left = `${relativeX - 5}px`
+	}
+	elt.onpointerup = (e) => {
+		elt.releasePointerCapture(evt.pointerId)
+		elt.onpointermove = null
+		audio.currentTime = newProgress * audio.duration
+		grabbed = false
+	}
+}
+
+function getFullTime(totalSeconds) {
+	const seconds = Math.floor(totalSeconds % 60)
+	const minutes = Math.floor(totalSeconds / 60)
+	return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+}
+
+
+
+
+function InitPlayer() {
+	const init = () => {
+		const totalMinutes = Math.floor(audio.duration / 60)
+		const totalSeconds = Math.floor(audio.duration % 60)
+		const totalMinutesElt = htmx.find('#player #duration #total-minutes')
+		const totalSecondsElt = htmx.find('#player #duration #total-seconds')
+		totalMinutesElt.innerHTML = totalMinutes.toString().padStart(2, '0')
+		totalSecondsElt.innerHTML = totalSeconds.toString().padStart(2, '0')
+		htmx.find("#page").style.marginBottom = '100px';
+	}
+	if (audio.readyState > 0) {
+		init()
+	} else {
+		audio.onloadedmetadata = (e) => {
+			init()
+		}
+	}
+}
+
+InitPlayer()
+
+
+function HandleTimeClick(elt, e) {
+	const parent = elt.parentNode
+	let newProgress
+	let relativeX = e.clientX - parent.offsetLeft
+	relativeX = Math.max(0, relativeX)
+	relativeX = Math.min(parent.offsetWidth, relativeX)
+	newProgress = relativeX / parent.offsetWidth
+	audio.currentTime = newProgress * audio.duration
+}
+
+function HandleMouseoverTime(elt, e) {
+	const parent = elt.parentNode
+	let newProgress
+	let relativeX = e.clientX - parent.offsetLeft
+	relativeX = Math.max(0, relativeX)
+	relativeX = Math.min(parent.offsetWidth, relativeX)
+	newProgress = relativeX / parent.offsetWidth
+	const hovertime = Math.floor(newProgress * audio.duration)
+	const newElt = document.createElement('div')
+	newElt.id = "time-tooltip"
+	newElt.style.left = `${e.clientX}px`
+	newElt.innerText = getFullTime(hovertime)
+	elt.appendChild(newElt)
+}
+
+
+function HandleMousemoveTime(elt, e) {
+	const parent = elt.parentNode
+	const tooltipElt = document.getElementById('time-tooltip')
+	let newProgress
+
+	let relativeX = e.clientX - parent.offsetLeft
+	relativeX = Math.max(0, relativeX)
+	relativeX = Math.min(parent.offsetWidth, relativeX)
+	newProgress = relativeX / parent.offsetWidth
+	const newTooltipTime = Math.floor(newProgress * audio.duration)
+	tooltipElt.innerText = getFullTime(newTooltipTime)
+	tooltipElt.style.left = `${e.clientX}px`
+}
+
+</script>
+		<style id="player-styles" hx-preserve="true">
+
+    #player {
+      position: fixed;
+      z-index: 4;
+      width: 100vw;
+      height: 105px;
+      bottom: 0;
+      border-top: 1px solid gray;
+      background-color: var(--dark-gray);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: auto;
+    }
+
+    #toggle-play-button {
+	height: 100%;
+	aspect-ratio: 1;
+	border-radius:100%;
+	background-color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+    }
+    #toggle-play-button:hover {
+	background-color: gray;
+    }
+
+    #time-tooltip {
+	position: absolute; 
+	transform: translateY(-100%) translateX(-50%);
+	padding: 10px;
+	width: 40px;
+	height: 20px;
+	font-size: 0.8em;
+	background-color: var(--dark-gray);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-family: Inter;
+	font-weight: bold;
+	border-radius: 5px;
+	color: white;
+    }
+
+
+#toggle-play-button .pause-bars {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 10%;
+  }
+
+#toggle-play-button .pause-bars .pause-bar {
+	width: 10%;
+	height: 40%;
+	background-color: var(--dark-gray);
+  }
+
+
+#toggle-play-button .play-triangle {
+      position: absolute;
+      background-color: black;
+      height: 100%;
+      width: 100%;
+      clip-path: polygon(40% 33%, 66% 50%, 40% 66%, 40% 33%);
+    }
+
+
+    #player #player-controls {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 30px;
+	gap: 15px;
+	position: relative;
+    }
+
+ .triangle-forward-container {
+	width: 100%;
+	height: 100%;
+	transform: translateY(15%); 
+}
+ .triangle-back-container {
+	width: 100%;
+	height: 100%;
+	transform: translateY(65%); 
+}
+
+ .triangle {
+	position: relative;
+	background-color: orange;
+	text-align: left;
+	height: 100%;
+	aspect-ratio: 1;
+}
+  .triangle:before,
+.triangle:after {
+	content: '';
+	position: absolute;
+	background-color: inherit;
+	height: 100%;
+	aspect-ratio: 1;
+}
+.triangle,
+.triangle:before,
+.triangle:after {
+	border-top-right-radius: 30%;
+}
+
+.triangle-forward {
+	transform: rotate(-90deg) skewX(-30deg) scale(1,.866);
+}
+
+.triangle-back {
+	transform: rotate(90deg) skewX(-30deg) scale(1,.866);
+}
+
+.triangle:before {
+	transform: rotate(-135deg) skewX(-45deg) scale(1.414,.707) translate(0,-50%);
+}
+.triangle:after {
+	transform: rotate(135deg) skewY(-45deg) scale(.707,1.414) translate(50%);
+}
+
+   .control {
+	background-color: white;
+   }
+
+   .control-elt {
+	cursor: pointer;
+   }
+
+   .control-elt:hover .control {
+	background-color: gray;
+   }
+
+   .skip-button {
+	height: 35%;
+	transform: translateY(-50%) translateX(5%);
+	width: fit-content;
+	display: flex;
+	align-items: start;
+	justify-content: center;
+	position: relative;
+   }
+   .skip-button-padding-elt {
+	width: 15px;
+   }
+
+    #player-inside {
+	display: flex;
+	justify-content: start;
+	width: 100%;
+    }
+
+   #queue-info {
+       flex-grow: 1;
+	display: flex;
+	justify-content: start;
+   }
+
+    #player #duration {
+	text-align: right;
+    }
+
+#player #current-time,
+  #player #duration {
+    width: 5em;
+    padding-bottom: 10px;
+    font-size: 0.8em;
+    color: white;
+    font-weight: bold;
+  }
+
+  #player-time {
+	display: flex;
+  }
+
+  #player #current-time #current-minutes,
+  #player #current-time #current-seconds, 
+  #player #duration #total-minutes,
+  #player #duration #total-seconds {
+     width: 2.5em;
+  }
+
+
+
+  #player .track-image {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    min-width: 75px;
+    min-height: 75px;
+  }
+
+#playback-time-bar-container {
+	transform: translateY(-50%);
+	min-height: 20px;
+	display: flex;
+	width: 100%;
+	align-items: center;
+	position: absolute;
+	cursor: pointer;
+}
+
+
+    #playback-time-bar {
+      pointer-events: none;
+      flex-grow: 1;
+      height: 5px;
+      background-color: #c8d2db;
+      border-radius: 2.5px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+
+    #playback-progress-marker {
+      pointer-events: auto;
+      height: 10px;
+      width: 10px;
+      background-color: gray;
+      position: absolute;
+      z-index: 3;
+      left: -5px;
+      clip-path: circle(50% at 50% 50%);
+      cursor: grab;
+    }
+#player-right-of-image {
+	padding: 10px 20px 10px 20px;
+}
+
+
+#player #current-track-info #title {
+	color: white;
+	font-family: Inter;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+
+#player #current-track-info  {
+	padding: 10px 20px 10px 20px;
+	color: #e0e0e0;
+	font-weight: 400;
+	font-size: 14px;
+	gap: 3px;
+	display: flex;
+	flex-direction: column;
+}
+#player #current-track-info #username  {
+	margin-bottom: 2px;
+}
+
+#player #current-track-info .tag {
+    all: unset;
+    font-size: 0.8em;
+    margin: 2px 1px;
+    padding: 3px 5px;
+/*    background-color: var(--light-gray-1); */
+/*    color: #424742; */
+    color: white; 
+    border: 1px solid #222222;
+    border-radius: 4px;
+}
+
+#player #current-track-info #bpm,
+#player #current-track-info #tags {
+	font-size: 11px;
+}
+
+#player #current-track-info #tags {
+	margin-top: 3px;
+	display: flex;
+	gap: 3px;
+	}
+
+#player .separator {
+	min-width: 1.5px;
+	width: 1.5px;
+	height: 90%;
+	background-color: #242323;
+	align-self: center;
+}
+
+
+#player .track-image>img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  </style>
+		<style hx-preserve="true" id="playing-indicator-styles">
+ #playing-indicator {
+	height: 20px;
+	width: 20px;
+	aspect-ratio: 1;
+	position: relative;
+	align-items: center;
+	justify-content: center;
+	display: flex;
+	padding: 5px;
+	border-radius: 100%;
+	background-color: var(--dark-gray);
+  }
+ #playing-indicator-content {
+	aspect-ratio: 1;
+	height: 50%;
+	position: relative;
+	transform: translateX(-30%) translateY(-50%); 
+  }
+
+
+
+  </style>
+	</head>
+}

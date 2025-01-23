@@ -1,0 +1,7 @@
+package components
+
+templ Modal(modalName string, inner templ.Component) {
+	<div id="modal" tabindex="0" hx-on:focusout="console.log(event);if (!this.contains(event.explicitOriginalTarget)) { this.innerHTML = ''}" hx-on:htmx-after-settle="this.focus()">
+		@inner
+	</div>
+}

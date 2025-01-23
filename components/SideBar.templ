@@ -1,0 +1,15 @@
+package components
+
+templ SideBar() {
+	<nav id="sidebar">
+		<div class="icon-container" id="home-button" hx-trigger="click" hx-target="#page-content" hx-get="/feed" hx-push-url="true">
+			@HomeIcon("icon-med")
+		</div>
+		<div class="icon-container" id="globe-button" hx-trigger="click" hx-target="#page-content" hx-get="/" hx-push-url="true">
+			@GlobeIcon("icon-med")
+		</div>
+		<div class="icon-container" id="submissions-button" hx-trigger="click" hx-target="#page-content" hx-get="/" hx-push-url="true">
+			@SubmissionsIcon("icon-med")
+		</div>
+	</nav>
+}

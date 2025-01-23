@@ -1,0 +1,12 @@
+package components
+
+import "github.com/jmarren/deepfried/util"
+
+templ Admin() {
+	<head>
+		<link href={ util.GetStaticSrc("css/admin.css") } rel="stylesheet" type="text/css"/>
+	</head>
+	<div id="admin-page">
+		Admin Page 
+	</div>
+}
