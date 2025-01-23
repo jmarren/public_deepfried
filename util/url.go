@@ -6,29 +6,47 @@ import (
 	"strings"
 )
 
+type IURL interface {
+	EscapedPath() string
+	EscapedFragment() string
+	String() string
+	Redacted() string
+	IsAbs() bool
+	Query() url.Values
+	RequestURI() string
+	Hostname() string
+	UnmarshalBinary(text []byte) error
+	MarshalBinary() (text []byte, err error)
+	Port() string
+}
+
+type IValues interface {
+	Set(key, value string)
+	String() string
+	Get(key string) string
+	Add(key, value string)
+	Del(key string)
+	Has(key string) bool
+	Encode() string
+}
+
+type ParseIURLType func(rawURL string) (IURL, error)
+
+var urlParse ParseIURLType = func(rawURL string) (IURL, error) {
+	return url.Parse(rawURL)
+}
+
 func UpdateQueryParam(currentUrl string, key string, value string) (string, error) {
-	url, err := url.Parse(currentUrl)
+	url, err := urlParse(currentUrl)
 	if err != nil {
 		return "", err
 	}
 	q := url.Query()
 	q.Set(key, value)
-	url.RawQuery = q.Encode()
-	return url.String(), nil
+	return fmt.Sprintf("%s?%s", currentUrl, q.Encode()), nil
 }
 
 func ChangePathValue(url string, pathIndex int, newValue string) {
 	pathArr := strings.Split(url, "/")
 	fmt.Printf("pathArr: %v\n", pathArr)
 }
-
-// func ChangePathValue(currentUrl string, pathParam string, newValue string) (string, error) {
-// 	fmt.Printf("currentUrl: %s\npathParam: %s\nnewValue: %s\n", currentUrl, pathParam, newValue)
-// 	currUrl, err := url.Parse(currentUrl)
-// 	Eprint(err)
-// 	fmt.Printf("currUrl: %v\n", currUrl)
-// 	newUrl, err := url.JoinPath(currentUrl, "1")
-// 	Eprint(err)
-//
-// 	return newUrl, nil
-// }

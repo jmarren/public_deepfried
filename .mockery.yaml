@@ -1,14 +1,29 @@
 with-expecter: True
 packages:
-  github.com/jmarren/deepfried/handlers:
+  github.com/jmarren/deepfried/util:
     interfaces:
-      TagService:
+      IURL:
         config:
           dir: "{{.InterfaceDir}}"
-          mockName: MockTagService
+          mockName: MockURL
           inpackage: True
-      UserService:
-        config:
+      IValues:
+          config:
           dir: "{{.InterfaceDir}}"
-          mockName: MockUserService
+          mockName: MockValues
           inpackage: True
+
+
+
+  # github.com/jmarren/deepfried/handlers:
+  #   interfaces:
+  #     TagService:
+  #       config:
+  #         dir: "{{.InterfaceDir}}"
+  #         mockName: MockTagService
+  #         inpackage: True
+  #     UserService:
+  #       config:
+  #         dir: "{{.InterfaceDir}}"
+  #         mockName: MockUserService
+  #         inpackage: True
